@@ -1,112 +1,280 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from '@/constants/colors';
+import { useApp } from '@/context/AppContext';
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+export default function ProfileScreen() {
+  const colorScheme = useColorScheme() ?? 'light';
+  const colors = Colors[colorScheme];
+  const router = useRouter();
 
-export default function TabTwoScreen() {
+  const { dailyGoals, userId } = useApp();
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={[styles.title, { color: colors.text }]}>Profile</Text>
+      </View>
+
+      {/* User Info Card */}
+      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <View style={styles.profileHeader}>
+          <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
+            <Ionicons name="person" size={40} color="#FFF" />
+          </View>
+          <View style={styles.userInfo}>
+            <Text style={[styles.userName, { color: colors.text }]}>User #{userId}</Text>
+            <Text style={[styles.userEmail, { color: colors.textSecondary }]}>
+              demo@forq.app
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Daily Goals Summary */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Daily Goals</Text>
+          <TouchableOpacity onPress={() => router.push('/goals')}>
+            <Ionicons name="chevron-forward" size={24} color={colors.textTertiary} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <View style={styles.goalRow}>
+            <View style={styles.goalLabel}>
+              <Ionicons name="flame" size={20} color={colors.calories} />
+              <Text style={[styles.goalLabelText, { color: colors.text }]}>Calories</Text>
+            </View>
+            <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
+              {dailyGoals.calories} kcal
+            </Text>
+          </View>
+
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+
+          <View style={styles.goalRow}>
+            <View style={styles.goalLabel}>
+              <Ionicons name="nutrition" size={20} color={colors.protein} />
+              <Text style={[styles.goalLabelText, { color: colors.text }]}>Protein</Text>
+            </View>
+            <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
+              {dailyGoals.protein}g
+            </Text>
+          </View>
+
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+
+          <View style={styles.goalRow}>
+            <View style={styles.goalLabel}>
+              <Ionicons name="pizza" size={20} color={colors.carbs} />
+              <Text style={[styles.goalLabelText, { color: colors.text }]}>Carbs</Text>
+            </View>
+            <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
+              {dailyGoals.carbs}g
+            </Text>
+          </View>
+
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+
+          <View style={styles.goalRow}>
+            <View style={styles.goalLabel}>
+              <Ionicons name="water" size={20} color={colors.fat} />
+              <Text style={[styles.goalLabelText, { color: colors.text }]}>Fat</Text>
+            </View>
+            <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
+              {dailyGoals.fat}g
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Settings */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Settings</Text>
+
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => router.push('/goals')}>
+            <View style={styles.settingLabel}>
+              <Ionicons name="flag-outline" size={24} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Daily Goals</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+
+          <TouchableOpacity style={styles.settingRow}>
+            <View style={styles.settingLabel}>
+              <Ionicons name="notifications-outline" size={24} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Notifications</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+
+          <TouchableOpacity style={styles.settingRow}>
+            <View style={styles.settingLabel}>
+              <Ionicons name="moon-outline" size={24} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Theme</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+
+          <TouchableOpacity style={styles.settingRow}>
+            <View style={styles.settingLabel}>
+              <Ionicons name="language-outline" size={24} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Language</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+
+          <TouchableOpacity style={styles.settingRow}>
+            <View style={styles.settingLabel}>
+              <Ionicons name="document-text-outline" size={24} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Privacy Policy</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* About */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>About</Text>
+
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <View style={styles.aboutRow}>
+            <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>Version</Text>
+            <Text style={[styles.aboutValue, { color: colors.text }]}>1.0.0</Text>
+          </View>
+
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+
+          <View style={styles.aboutRow}>
+            <Text style={[styles.aboutLabel, { color: colors.textSecondary }]}>Build</Text>
+            <Text style={[styles.aboutValue, { color: colors.text }]}>2026.01.08</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.footer} />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
   },
-  titleContainer: {
+  header: {
+    padding: 20,
+    paddingTop: 60,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+  },
+  section: {
+    padding: 20,
+  },
+  sectionHeader: {
     flexDirection: 'row',
-    gap: 8,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  card: {
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 12,
+  },
+  profileHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userInfo: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  userEmail: {
+    fontSize: 14,
+  },
+  goalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  goalLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  goalLabelText: {
+    fontSize: 16,
+  },
+  goalValue: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  divider: {
+    height: 1,
+  },
+  settingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  settingLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  settingText: {
+    fontSize: 16,
+  },
+  aboutRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  aboutLabel: {
+    fontSize: 14,
+  },
+  aboutValue: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  footer: {
+    height: 40,
   },
 });
