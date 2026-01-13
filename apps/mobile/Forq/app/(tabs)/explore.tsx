@@ -11,7 +11,28 @@ export default function ProfileScreen() {
   const colors = Colors[colorScheme];
   const router = useRouter();
 
-  const { dailyGoals, userId } = useApp();
+  const { dailyGoals, user, logoutUser } = useApp();
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            await logoutUser();
+            router.replace('/login');
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -27,9 +48,13 @@ export default function ProfileScreen() {
             <Ionicons name="person" size={40} color="#FFF" />
           </View>
           <View style={styles.userInfo}>
-            <Text style={[styles.userName, { color: colors.text }]}>User #{userId}</Text>
+            <Text style={[styles.userName, { color: colors.text }]}>
+              {user?.firstName && user?.lastName
+                ? `${user.firstName} ${user.lastName}`
+                : user?.username || `User #${user?.id}`}
+            </Text>
             <Text style={[styles.userEmail, { color: colors.textSecondary }]}>
-              demo@forq.app
+              {user?.email || 'No email'}
             </Text>
           </View>
         </View>
@@ -144,6 +169,15 @@ export default function ProfileScreen() {
               <Text style={[styles.settingText, { color: colors.text }]}>Privacy Policy</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
+          </TouchableOpacity>
+
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+
+          <TouchableOpacity style={styles.settingRow} onPress={handleLogout}>
+            <View style={styles.settingLabel}>
+              <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
+              <Text style={[styles.settingText, { color: '#FF3B30' }]}>Logout</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>

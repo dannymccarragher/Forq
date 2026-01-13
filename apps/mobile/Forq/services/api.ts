@@ -309,6 +309,49 @@ export async function removeFavorite(
   });
 }
 
+// ==================== AUTHENTICATION ROUTES ====================
+
+/**
+ * Register a new user
+ */
+export async function register(userData: {
+  username: string;
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+}): Promise<{ success: boolean; message: string; user: any }> {
+  return request('/api/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(userData),
+  });
+}
+
+/**
+ * Login user
+ */
+export async function login(
+  emailOrUsername: string,
+  password: string
+): Promise<{ success: boolean; message: string; user: any }> {
+  return request('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ emailOrUsername, password }),
+  });
+}
+
+/**
+ * Verify user session
+ */
+export async function verifyUser(
+  userId: number
+): Promise<{ success: boolean; user: any }> {
+  return request('/api/auth/verify', {
+    method: 'POST',
+    body: JSON.stringify({ userId }),
+  });
+}
+
 // ==================== USER ROUTES ====================
 
 /**
