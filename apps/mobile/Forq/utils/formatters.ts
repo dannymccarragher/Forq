@@ -4,8 +4,10 @@
  * Format number to display with specified decimal places
  */
 export const formatNumber = (value: number | null | undefined, decimals: number = 0): string => {
-  if (value === null || value === undefined || isNaN(value)) return '0';
-  return value.toFixed(decimals);
+  if (value === null || value === undefined) return '0';
+  const numValue = Number(value);
+  if (isNaN(numValue)) return '0';
+  return numValue.toFixed(decimals);
 };
 
 /**
@@ -70,8 +72,9 @@ export const formatDateShort = (date: Date | string): string => {
 /**
  * Calculate percentage for progress bars
  */
-export const calculatePercentage = (current: number, goal: number): number => {
-  if (goal === 0) return 0;
+export const calculatePercentage = (current: number | null | undefined, goal: number | null | undefined): number => {
+  if (current === null || current === undefined || isNaN(current)) return 0;
+  if (goal === null || goal === undefined || isNaN(goal) || goal === 0) return 0;
   return Math.min((current / goal) * 100, 100);
 };
 
