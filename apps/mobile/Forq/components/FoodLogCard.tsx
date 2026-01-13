@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/colors';
 import { FoodLogWithFood } from '@/types/api';
-import { formatCalories, formatMacro, formatTime, truncateText, getMealTypeEmoji } from '@/utils/formatters';
+import { formatCalories, formatMacro, formatTime, truncateText } from '@/utils/formatters';
 
 interface FoodLogCardProps {
   log: FoodLogWithFood;
@@ -15,6 +15,16 @@ interface FoodLogCardProps {
 export const FoodLogCard: React.FC<FoodLogCardProps> = ({ log, onDelete, onEdit }) => {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
+
+  const formatServings = (servings: number): string => {
+    if (servings === null || servings === undefined) return '0';
+    const numValue = Number(servings);
+    if (isNaN(numValue)) return '0';
+    if (Number.isInteger(numValue)) {
+      return numValue.toString();
+    }
+    return numValue.toFixed(2).replace(/\.?0+$/, '');
+  };
 
   const handleDelete = () => {
     Alert.alert(
@@ -36,7 +46,6 @@ export const FoodLogCard: React.FC<FoodLogCardProps> = ({ log, onDelete, onEdit 
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.titleContainer}>
-          <Text style={styles.emoji}>{getMealTypeEmoji(log.log.mealType)}</Text>
           <View style={styles.titleText}>
             <Text style={[styles.foodName, { color: colors.text }]} numberOfLines={1}>
               {log.food?.name || 'Unknown Food'}
@@ -65,9 +74,9 @@ export const FoodLogCard: React.FC<FoodLogCardProps> = ({ log, onDelete, onEdit 
 
       {/* Servings */}
       <Text style={[styles.servings, { color: colors.textSecondary }]}>
-        {log.log.servings} serving{log.log.servings !== 1 ? 's' : ''}
+        {formatServings(log.log.servings)} serving{log.log.servings !== 1 ? 's' : ''}
         {log.food?.servingSize && log.food?.servingUnit && log.log.servings &&
-          ` (${((log.log.servings || 0) * (log.food.servingSize || 0)).toFixed(1)} ${log.food.servingUnit})`
+          ` (${formatServings((log.log.servings || 0) * (log.food.servingSize || 0))} ${log.food.servingUnit})`
         }
       </Text>
 
@@ -131,13 +140,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
     flex: 1,
-    marginRight: 12,
-  },
-  emoji: {
-    fontSize: 24,
     marginRight: 12,
   },
   titleText: {
