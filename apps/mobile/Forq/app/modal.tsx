@@ -18,6 +18,13 @@ export default function ModalScreen() {
       color: colors.primary,
     },
     {
+      icon: 'barcode',
+      label: 'Scan Food',
+      description: 'Scan barcode to add food',
+      route: '/add-food?tab=barcode',
+      color: colors.info,
+    },
+    {
       icon: 'person',
       label: 'Profile',
       description: 'View your profile',

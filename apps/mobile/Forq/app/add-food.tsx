@@ -8,6 +8,7 @@ import {
   TextInput,
   FlatList,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -15,10 +16,11 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 import { FoodSearchCard } from '@/components/FoodSearchCard';
+import { BarcodeScanner } from '@/components/BarcodeScanner';
 import * as api from '@/services/api';
 import { FatSecretFood, Food } from '@/types/api';
 
-type TabType = 'search' | 'favorites' | 'recent';
+type TabType = 'search' | 'favorites' | 'barcode';
 
 export default function AddFoodScreen() {
   const colorScheme = useColorScheme() ?? 'light';
@@ -33,10 +35,16 @@ export default function AddFoodScreen() {
   const [searchResults, setSearchResults] = useState<FatSecretFood[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [barcodeScanned, setBarcodeScanned] = useState(false);
 
   useEffect(() => {
     refreshFavorites();
-  }, []);
+
+    // Check if we should open the barcode scanner
+    if (params.tab === 'barcode') {
+      setActiveTab('barcode');
+    }
+  }, [params.tab]);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -63,6 +71,55 @@ export default function AddFoodScreen() {
       // Database food
       router.push(`/food-detail?foodId=${food.id}&source=database&mealType=${params.mealType || 'breakfast'}`);
     }
+  };
+
+  const handleBarcodeScan = async (barcode: string) => {
+    if (barcodeScanned) return; // Prevent multiple scans
+
+    setBarcodeScanned(true);
+    try {
+      const result = await api.scanBarcode(barcode);
+
+      if (result && result.food_id) {
+        // Navigate to food detail with the scanned food
+        router.push(`/food-detail?foodId=${result.food_id}&source=fatsecret&mealType=${params.mealType || 'breakfast'}`);
+      } else {
+        Alert.alert(
+          'Not Found',
+          'No food found for this barcode. Try searching manually.',
+          [{
+            text: 'OK',
+            onPress: () => {
+              setBarcodeScanned(false);
+              setActiveTab('search');
+            }
+          }]
+        );
+      }
+    } catch (error) {
+      console.error('Barcode scan error:', error);
+      Alert.alert(
+        'Scan Failed',
+        'Unable to find food for this barcode. Please try again or search manually.',
+        [{
+          text: 'OK',
+          onPress: () => {
+            setBarcodeScanned(false);
+            setActiveTab('search');
+          }
+        }]
+      );
+    }
+  };
+
+  const handleOpenScanner = () => {
+    setBarcodeScanned(false); // Reset when opening scanner
+    setActiveTab('barcode');
+  };
+
+  const handleCloseScanner = () => {
+    setBarcodeScanned(false); // Reset when closing scanner
+    setActiveTab('search');
   };
 
   const renderSearchTab = () => (
@@ -159,6 +216,16 @@ export default function AddFoodScreen() {
     </View>
   );
 
+  const renderBarcodeTab = () => {
+    return (
+      <BarcodeScanner
+        onScan={handleBarcodeScan}
+        onClose={handleCloseScanner}
+        isProcessing={barcodeScanned}
+      />
+    );
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
@@ -167,8 +234,8 @@ export default function AddFoodScreen() {
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={[styles.title, { color: colors.text }]}>Add Food</Text>
-        <TouchableOpacity onPress={() => router.push('/create-food')} style={styles.createButton}>
-          <Ionicons name="add-circle-outline" size={24} color={colors.primary} />
+        <TouchableOpacity onPress={handleOpenScanner} style={styles.createButton}>
+          <Ionicons name="barcode-outline" size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -217,11 +284,34 @@ export default function AddFoodScreen() {
             Favorites
           </Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === 'barcode' && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
+          ]}
+          onPress={() => setActiveTab('barcode')}
+        >
+          <Ionicons
+            name="barcode"
+            size={20}
+            color={activeTab === 'barcode' ? colors.primary : colors.textSecondary}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              { color: activeTab === 'barcode' ? colors.primary : colors.textSecondary },
+            ]}
+          >
+            Scan
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Tab Content */}
       {activeTab === 'search' && renderSearchTab()}
       {activeTab === 'favorites' && renderFavoritesTab()}
+      {activeTab === 'barcode' && renderBarcodeTab()}
     </View>
   );
 }
