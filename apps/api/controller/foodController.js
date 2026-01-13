@@ -189,8 +189,21 @@ router.get("/barcode/:code", async (req, res) => {
             });
         }
 
-        const result = await fatSecretService.scanBarcode(code);
-        res.json(result);
+        //get the food_id from the barcode
+        const barcodeResult = await fatSecretService.scanBarcode(code);
+
+        // Check if we got a valid food_id
+        if (!barcodeResult || !barcodeResult.food_id || !barcodeResult.food_id.value) {
+            return res.status(404).json({
+                error: "Food not found for this barcode",
+            });
+        }
+
+        // fetch the full food details
+        const foodId = barcodeResult.food_id.value;
+        const foodDetails = await fatSecretService.getFoodById(foodId);
+
+        res.json(foodDetails);
     } catch (error) {
         res.status(500).json({
             error: "Failed to scan barcode",
