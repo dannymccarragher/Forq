@@ -1,9 +1,37 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Food, FoodLogWithFood, NutritionalSummary, MealType } from '@/types/api';
 import * as api from '@/services/api';
+import * as SecureStore from 'expo-secure-store';
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  profilePicture?: string;
+  goalCalories?: number;
+  goalProtein?: number;
+  goalCarbs?: number;
+  goalFat?: number;
+}
 
 interface AppContextType {
-  // User state
+  // Auth state
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  user: User | null;
+  loginUser: (emailOrUsername: string, password: string) => Promise<void>;
+  registerUser: (userData: {
+    username: string;
+    email: string;
+    password: string;
+    firstName?: string;
+    lastName?: string;
+  }) => Promise<void>;
+  logoutUser: () => Promise<void>;
+
+  // User state (deprecated - use user.id instead)
   userId: number;
   setUserId: (id: number) => void;
 
@@ -56,10 +84,16 @@ interface AppProviderProps {
   children: ReactNode;
 }
 
+const SECURE_STORE_KEY = 'forq_user_id';
+
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
+  // Auth state
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [user, setUser] = useState<User | null>(null);
+
   // For demo purposes, using hardcoded userId. In production, get from auth
-  // TODO: Get userId from auth
-  const [userId, setUserId] = useState<number>(1);
+  const [userId, setUserId] = useState<number>(0);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   // Summary state
@@ -82,6 +116,100 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     fat: 65,
   });
   const [loadingGoals, setLoadingGoals] = useState(false);
+
+  // Check for existing session on mount
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  // Check if user has a saved session
+  const checkAuthStatus = async () => {
+    try {
+      const storedUserId = await SecureStore.getItemAsync(SECURE_STORE_KEY);
+
+      if (storedUserId) {
+        // Verify with backend
+        const response = await api.verifyUser(parseInt(storedUserId));
+
+        if (response.success && response.user) {
+          setUser(response.user);
+          setUserId(response.user.id);
+          setIsAuthenticated(true);
+        } else {
+          // Invalid session, clear storage
+          await SecureStore.deleteItemAsync(SECURE_STORE_KEY);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to check auth status:', error);
+      // Clear invalid session
+      await SecureStore.deleteItemAsync(SECURE_STORE_KEY);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Login user
+  const loginUser = async (emailOrUsername: string, password: string) => {
+    try {
+      const response = await api.login(emailOrUsername, password);
+
+      if (response.success && response.user) {
+        // Save user ID to secure storage
+        await SecureStore.setItemAsync(SECURE_STORE_KEY, response.user.id.toString());
+
+        setUser(response.user);
+        setUserId(response.user.id);
+        setIsAuthenticated(true);
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
+  };
+
+  // Register user
+  const registerUser = async (userData: {
+    username: string;
+    email: string;
+    password: string;
+    firstName?: string;
+    lastName?: string;
+  }) => {
+    try {
+      const response = await api.register(userData);
+
+      if (response.success && response.user) {
+        // Save user ID to secure storage
+        await SecureStore.setItemAsync(SECURE_STORE_KEY, response.user.id.toString());
+
+        setUser(response.user);
+        setUserId(response.user.id);
+        setIsAuthenticated(true);
+      }
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw error;
+    }
+  };
+
+  // Logout user
+  const logoutUser = async () => {
+    try {
+      // Clear secure storage
+      await SecureStore.deleteItemAsync(SECURE_STORE_KEY);
+
+      // Clear state
+      setUser(null);
+      setUserId(0);
+      setIsAuthenticated(false);
+      setDailySummary(null);
+      setFoodLogs([]);
+      setFavorites([]);
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   // Format date for API
   const formatDate = (date: Date): string => {
@@ -256,6 +384,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }, [selectedDate]);
 
   const value: AppContextType = {
+    isAuthenticated,
+    isLoading,
+    user,
+    loginUser,
+    registerUser,
+    logoutUser,
     userId,
     setUserId,
     selectedDate,
