@@ -1,4 +1,5 @@
 // API Service for backend communication
+import Constants from 'expo-constants';
 import {
   Food,
   FoodLog,
@@ -11,7 +12,7 @@ import {
   MealType,
 } from '@/types/api';
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = Constants.expoConfig?.extra?.apiBaseUrl;
 
 // Helper function for making requests
 async function request<T>(

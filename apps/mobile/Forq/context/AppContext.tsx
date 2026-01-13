@@ -58,6 +58,7 @@ interface AppProviderProps {
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // For demo purposes, using hardcoded userId. In production, get from auth
+  // TODO: Get userId from auth
   const [userId, setUserId] = useState<number>(1);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
