@@ -66,8 +66,8 @@ export const FoodLogCard: React.FC<FoodLogCardProps> = ({ log, onDelete, onEdit 
       {/* Servings */}
       <Text style={[styles.servings, { color: colors.textSecondary }]}>
         {log.log.servings} serving{log.log.servings !== 1 ? 's' : ''}
-        {log.food?.servingSize && log.food?.servingUnit && 
-          ` (${(log.log.servings * log.food.servingSize).toFixed(1)} ${log.food.servingUnit})`
+        {log.food?.servingSize && log.food?.servingUnit && log.log.servings &&
+          ` (${((log.log.servings || 0) * (log.food.servingSize || 0)).toFixed(1)} ${log.food.servingUnit})`
         }
       </Text>
 
@@ -79,21 +79,21 @@ export const FoodLogCard: React.FC<FoodLogCardProps> = ({ log, onDelete, onEdit 
           </Text>
           <Text style={[styles.macroLabel, { color: colors.textTertiary }]}>cal</Text>
         </View>
-        
+
         <View style={styles.macro}>
           <Text style={[styles.macroValue, { color: colors.protein }]}>
             {formatMacro(log.log.totalProtein)}g
           </Text>
           <Text style={[styles.macroLabel, { color: colors.textTertiary }]}>protein</Text>
         </View>
-        
+
         <View style={styles.macro}>
           <Text style={[styles.macroValue, { color: colors.carbs }]}>
             {formatMacro(log.log.totalCarbs)}g
           </Text>
           <Text style={[styles.macroLabel, { color: colors.textTertiary }]}>carbs</Text>
         </View>
-        
+
         <View style={styles.macro}>
           <Text style={[styles.macroValue, { color: colors.fat }]}>
             {formatMacro(log.log.totalFat)}g

@@ -139,11 +139,14 @@ export default function FoodDetailScreen() {
       // First, save the food to the database
       const saveResponse = await api.saveFoodFromApi(userId, foodDetail);
 
+      // Calculate the correct multiplier to use as servings
+      const servingsToLog = getMultiplier();
+
       // Then log it
       await logFood(
         saveResponse.food.id,
         selectedMeal,
-        parseFloat(amount) || 1,
+        servingsToLog,
         notes || undefined
       );
 

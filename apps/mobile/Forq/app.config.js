@@ -6,7 +6,7 @@ export default {
     slug: "Forq",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/images/icon.png",
+    icon: "./assets/images/Forq.png",
     scheme: "forq",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,

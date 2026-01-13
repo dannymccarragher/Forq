@@ -46,7 +46,7 @@ export const MacroCard: React.FC<MacroCardProps> = ({ label, current, goal, unit
       </View>
 
       <Text style={[styles.percentage, { color: colors.textTertiary }]}>
-        {percentage.toFixed(0)}%
+        {(percentage || 0).toFixed(0)}%
       </Text>
     </View>
   );

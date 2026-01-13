@@ -7,10 +7,9 @@ import { Colors } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 import { CalorieRing } from '@/components/CalorieRing';
 import { MacroCard } from '@/components/MacroCard';
-import { MealSection } from '@/components/MealSection';
+import { FoodLogCard } from '@/components/FoodLogCard';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { formatDateShort } from '@/utils/formatters';
-import { MealType } from '@/types/api';
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme() ?? 'light';
@@ -56,8 +55,8 @@ export default function HomeScreen() {
     );
   };
 
-  const handleAddFood = (mealType: MealType) => {
-    router.push(`/add-food?mealType=${mealType}`);
+  const handleAddFood = () => {
+    router.push('/add-food');
   };
 
   const handleDeleteLog = async (logId: number) => {
@@ -72,36 +71,6 @@ export default function HomeScreen() {
   const currentProtein = dailySummary?.totals.protein || 0;
   const currentCarbs = dailySummary?.totals.carbs || 0;
   const currentFat = dailySummary?.totals.fat || 0;
-
-  // Group logs by meal type
-  const mealTypes: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
-  const logsByMeal: { [key in MealType]: typeof foodLogs } = {
-    breakfast: [],
-    lunch: [],
-    dinner: [],
-    snack: [],
-  };
-
-  foodLogs.forEach((log) => {
-    const mealType = log.log.mealType as MealType;
-    if (logsByMeal[mealType]) {
-      logsByMeal[mealType].push(log);
-    }
-  });
-
-  // Calculate calories per meal
-  const caloriesByMeal: { [key in MealType]: number } = {
-    breakfast: 0,
-    lunch: 0,
-    dinner: 0,
-    snack: 0,
-  };
-
-  if (dailySummary) {
-    dailySummary.byMealType.forEach((meal) => {
-      caloriesByMeal[meal.mealType as MealType] = meal.calories;
-    });
-  }
 
   return (
     <ScrollView
@@ -205,19 +174,37 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Food Diary - Meal Sections */}
+      {/* Food Diary */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Food Diary</Text>
-        {mealTypes.map((mealType) => (
-          <MealSection
-            key={mealType}
-            mealType={mealType}
-            logs={logsByMeal[mealType]}
-            totalCalories={caloriesByMeal[mealType]}
-            onAddFood={() => handleAddFood(mealType)}
-            onDeleteLog={handleDeleteLog}
-          />
-        ))}
+        <View style={styles.diaryHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Food Diary</Text>
+          <TouchableOpacity
+            style={[styles.addButton, { backgroundColor: colors.primary }]}
+            onPress={handleAddFood}
+          >
+            <Ionicons name="add" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+        
+        {foodLogs.length === 0 ? (
+          <View style={[styles.emptyState, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Ionicons name="restaurant-outline" size={48} color={colors.textTertiary} />
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+              No food logged yet
+            </Text>
+            <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
+              Start tracking your meals
+            </Text>
+          </View>
+        ) : (
+          foodLogs.map((log) => (
+            <FoodLogCard
+              key={log.log.id}
+              log={log}
+              onDelete={handleDeleteLog}
+            />
+          ))
+        )}
       </View>
 
       <View style={styles.footer} />
@@ -278,7 +265,36 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
+    marginBottom: 0,
+  },
+  diaryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 16,
+  },
+  addButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyState: {
+    padding: 40,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 16,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    marginTop: 4,
   },
   macroGrid: {
     flexDirection: 'row',
