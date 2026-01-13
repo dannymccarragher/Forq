@@ -21,7 +21,7 @@ export const formatCalories = (calories: number | null | undefined): string => {
  * Format macronutrient (protein, carbs, fat) display
  */
 export const formatMacro = (value: number | null | undefined): string => {
-  return formatNumber(value, 1);
+  return formatNumber(value, 0);
 };
 
 /**
