@@ -21,15 +21,17 @@ export const MacroCard: React.FC<MacroCardProps> = ({ label, current, goal, unit
     <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
 
-      <View style={styles.values}>
-        <Text style={[styles.current, { color: colors.text }]}>
-          {formatMacro(current)}
-        </Text>
-        <Text style={[styles.separator, { color: colors.textTertiary }]}>/</Text>
-        <Text style={[styles.goal, { color: colors.textSecondary }]}>
-          {formatMacro(goal)}
-        </Text>
-        <Text style={[styles.unit, { color: colors.textTertiary }]}>{unit}</Text>
+      <View style={styles.valuesContainer}>
+        <View style={styles.values}>
+          <Text style={[styles.current, { color: colors.text }]}>
+            {formatMacro(current)}
+          </Text>
+          <Text style={[styles.separator, { color: colors.textTertiary }]}>/</Text>
+          <Text style={[styles.goal, { color: colors.textSecondary }]}>
+            {formatMacro(goal)}
+          </Text>
+          <Text style={[styles.unit, { color: colors.textTertiary }]}>{unit}</Text>
+        </View>
       </View>
 
       {/* Progress bar */}
@@ -66,25 +68,29 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textTransform: 'uppercase',
   },
+  valuesContainer: {
+    marginBottom: 12,
+    overflow: 'hidden',
+  },
   values: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: 12,
+    flexWrap: 'wrap',
   },
   current: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   separator: {
-    fontSize: 18,
-    marginHorizontal: 4,
+    fontSize: 16,
+    marginHorizontal: 3,
   },
   goal: {
-    fontSize: 16,
+    fontSize: 14,
   },
   unit: {
-    fontSize: 12,
-    marginLeft: 4,
+    fontSize: 11,
+    marginLeft: 3,
   },
   progressBar: {
     height: 6,

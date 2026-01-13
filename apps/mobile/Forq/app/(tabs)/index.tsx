@@ -15,7 +15,7 @@ export default function HomeScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const router = useRouter();
-  
+
   const {
     selectedDate,
     setSelectedDate,
@@ -158,10 +158,10 @@ export default function HomeScreen() {
         <View style={styles.actionGrid}>
           <TouchableOpacity
             style={[styles.actionCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-            onPress={() => router.push('/search')}
+            onPress={handleAddFood}
           >
-            <Ionicons name="search" size={32} color={colors.info} />
-            <Text style={[styles.actionText, { color: colors.text }]}>Search Foods</Text>
+            <Ionicons name="add-circle" size={32} color={colors.primary} />
+            <Text style={[styles.actionText, { color: colors.text }]}>Add Foods</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -176,16 +176,8 @@ export default function HomeScreen() {
 
       {/* Food Diary */}
       <View style={styles.section}>
-        <View style={styles.diaryHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Food Diary</Text>
-          <TouchableOpacity
-            style={[styles.addButton, { backgroundColor: colors.primary }]}
-            onPress={handleAddFood}
-          >
-            <Ionicons name="add" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
-        
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Food Diary</Text>
+
         {foodLogs.length === 0 ? (
           <View style={[styles.emptyState, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Ionicons name="restaurant-outline" size={48} color={colors.textTertiary} />
@@ -265,20 +257,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
-    marginBottom: 0,
-  },
-  diaryHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: 16,
-  },
-  addButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   emptyState: {
     padding: 40,

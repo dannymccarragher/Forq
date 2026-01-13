@@ -365,35 +365,7 @@ export default function FoodDetailScreen() {
           </View>
         </View>
 
-        {/* Meal Selection */}
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>Meal</Text>
-          <View style={styles.mealGrid}>
-            {(['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).map((meal) => (
-              <TouchableOpacity
-                key={meal}
-                style={[
-                  styles.mealButton,
-                  {
-                    backgroundColor: selectedMeal === meal ? colors.primary : colors.backgroundSecondary,
-                    borderColor: selectedMeal === meal ? colors.primary : colors.border,
-                  },
-                ]}
-                onPress={() => setSelectedMeal(meal)}
-              >
-                <Text
-                  style={[
-                    styles.mealButtonText,
-                    { color: selectedMeal === meal ? '#FFF' : colors.text },
-                  ]}
-                >
-                  {meal.charAt(0).toUpperCase() + meal.slice(1)}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
+        
         {/* Notes */}
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Text style={[styles.cardTitle, { color: colors.text }]}>Notes (Optional)</Text>

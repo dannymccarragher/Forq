@@ -18,13 +18,6 @@ export default function ModalScreen() {
       color: colors.primary,
     },
     {
-      icon: 'search',
-      label: 'Search Foods',
-      description: 'Find foods in database',
-      route: '/search',
-      color: colors.info,
-    },
-    {
       icon: 'person',
       label: 'Profile',
       description: 'View your profile',
