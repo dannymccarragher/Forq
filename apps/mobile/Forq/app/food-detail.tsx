@@ -15,7 +15,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 import * as api from '@/services/api';
-import { FatSecretFoodDetail, FatSecretServing, MealType } from '@/types/api';
+import { FatSecretFoodDetail, FatSecretServing, MealType, Food } from '@/types/api';
 import { formatCalories, formatMacro, formatServing } from '@/utils/formatters';
 
 export default function FoodDetailScreen() {
@@ -24,7 +24,7 @@ export default function FoodDetailScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
-  const { userId, logFood, selectedDate } = useApp();
+  const { userId, logFood, selectedDate, favorites, isFavorite, toggleFavorite, refreshFavorites } = useApp();
 
   type ServingOption = {
     id: string;
@@ -43,6 +43,8 @@ export default function FoodDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showServingPicker, setShowServingPicker] = useState(false);
+  const [savedFoodId, setSavedFoodId] = useState<number | null>(null);
+  const [favoriting, setFavoriting] = useState(false);
 
   // Build serving options - include standard servings + standalone metric units
   const buildServingOptions = (servings: FatSecretServing[]): ServingOption[] => {
@@ -96,7 +98,52 @@ export default function FoodDetailScreen() {
 
     setLoading(true);
     try {
-      const detail = await api.getFoodById(params.foodId as string);
+      const source = params.source as string;
+      let detail: FatSecretFoodDetail;
+
+      if (source === 'database') {
+        // Load from database and convert to FatSecret format
+        const dbFoodResponse = await api.getFoodByDbId(parseInt(params.foodId as string), userId);
+        const dbFood = dbFoodResponse.food;
+        setSavedFoodId(dbFood.id); // Store the database food ID
+
+        // Convert database food to FatSecret format
+        detail = {
+          food_id: dbFood.fatSecretId || dbFood.id.toString(),
+          food_name: dbFood.name,
+          brand_name: dbFood.brand,
+          servings: {
+            serving: {
+              serving_id: '0',
+              serving_description: `${dbFood.servingSize || 100}${dbFood.servingUnit || 'g'}`,
+              serving_url: '',
+              metric_serving_amount: (dbFood.servingSize || 100).toString(),
+              metric_serving_unit: dbFood.servingUnit || 'g',
+              number_of_units: '1',
+              measurement_description: `${dbFood.servingSize || 100}${dbFood.servingUnit || 'g'}`,
+              calories: (dbFood.calories || 0).toString(),
+              carbohydrate: (dbFood.carbohydrates || 0).toString(),
+              protein: (dbFood.protein || 0).toString(),
+              fat: (dbFood.fat || 0).toString(),
+              saturated_fat: '0',
+              polyunsaturated_fat: '0',
+              monounsaturated_fat: '0',
+              cholesterol: '0',
+              sodium: (dbFood.sodium || 0).toString(),
+              potassium: '0',
+              fiber: (dbFood.fiber || 0).toString(),
+              sugar: (dbFood.sugar || 0).toString(),
+              vitamin_a: '0',
+              vitamin_c: '0',
+              calcium: '0',
+              iron: '0',
+            },
+          },
+        };
+      } else {
+        // Load from FatSecret API
+        detail = await api.getFoodById(params.foodId as string);
+      }
 
       // Validate that we have the required data structure
       if (!detail) {
@@ -136,15 +183,25 @@ export default function FoodDetailScreen() {
 
     setSaving(true);
     try {
-      // First, save the food to the database
-      const saveResponse = await api.saveFoodFromApi(userId, foodDetail);
+      const source = params.source as string;
+      let dbFoodId: number;
+
+      if (source === 'database') {
+        // Food is already in database, use the ID directly
+        dbFoodId = parseInt(params.foodId as string);
+      } else {
+        // FatSecret food - save to database first
+        const saveResponse = await api.saveFoodFromApi(userId, foodDetail);
+        dbFoodId = saveResponse.food.id;
+        setSavedFoodId(dbFoodId); // Store the saved food ID
+      }
 
       // Calculate the correct multiplier to use as servings
       const servingsToLog = getMultiplier();
 
-      // Then log it
+      // Log the food
       await logFood(
-        saveResponse.food.id,
+        dbFoodId,
         selectedMeal,
         servingsToLog,
         notes || undefined
@@ -161,6 +218,43 @@ export default function FoodDetailScreen() {
     }
   };
 
+  const handleToggleFavorite = async () => {
+    if (!foodDetail) return;
+
+    setFavoriting(true);
+    try {
+      // First, save the food to the database if not already saved
+      let dbFoodId = savedFoodId;
+      if (!dbFoodId) {
+        const saveResponse = await api.saveFoodFromApi(userId, foodDetail);
+        dbFoodId = saveResponse.food.id;
+        setSavedFoodId(dbFoodId);
+      }
+
+      // Find the food in favorites to toggle it
+      const food = favorites.find((f) => f.id === dbFoodId);
+      if (food) {
+        await toggleFavorite(food);
+      } else {
+        // If not in favorites list, need to get the food details first
+        const foodResponse = await api.getFoodByDbId(dbFoodId, userId);
+        await toggleFavorite(foodResponse.food);
+      }
+
+      await refreshFavorites();
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+      Alert.alert('Error', 'Failed to update favorites');
+    } finally {
+      setFavoriting(false);
+    }
+  };
+
+  const checkIfFavorited = () => {
+    if (!savedFoodId) return false;
+    return isFavorite(savedFoodId);
+  };
+
   if (loading) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -169,7 +263,7 @@ export default function FoodDetailScreen() {
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={[styles.title, { color: colors.text }]}>Food Details</Text>
-          <View style={styles.placeholder} />
+          <View style={styles.favoriteButton} />
         </View>
         <View style={styles.centerContent}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -186,7 +280,7 @@ export default function FoodDetailScreen() {
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={[styles.title, { color: colors.text }]}>Food Details</Text>
-          <View style={styles.placeholder} />
+          <View style={styles.favoriteButton} />
         </View>
         <View style={styles.centerContent}>
           <Text style={[styles.errorText, { color: colors.error }]}>Failed to load food details</Text>
@@ -234,7 +328,21 @@ export default function FoodDetailScreen() {
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={[styles.title, { color: colors.text }]}>Food Details</Text>
-        <View style={styles.placeholder} />
+        <TouchableOpacity
+          onPress={handleToggleFavorite}
+          style={styles.favoriteButton}
+          disabled={favoriting}
+        >
+          {favoriting ? (
+            <ActivityIndicator size="small" color={colors.primary} />
+          ) : (
+            <Ionicons
+              name={checkIfFavorited() ? 'heart' : 'heart-outline'}
+              size={24}
+              color={checkIfFavorited() ? colors.error : colors.text}
+            />
+          )}
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content}>
@@ -365,7 +473,7 @@ export default function FoodDetailScreen() {
           </View>
         </View>
 
-        
+
         {/* Notes */}
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Text style={[styles.cardTitle, { color: colors.text }]}>Notes (Optional)</Text>
@@ -421,8 +529,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
   },
-  placeholder: {
-    width: 40,
+  favoriteButton: {
+    padding: 8,
   },
   content: {
     flex: 1,
