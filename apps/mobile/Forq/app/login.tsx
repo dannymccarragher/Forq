@@ -16,10 +16,14 @@ import {
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useApp } from '@/context/AppContext';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from '@/constants/colors';
 
 export default function LoginScreen() {
   const router = useRouter();
   const { loginUser } = useApp();
+  const colorScheme = useColorScheme() ?? 'light';
+  const colors = Colors[colorScheme];
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,10 +53,10 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <StatusBar style="light" />
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.content}>
           {/* Logo */}
@@ -62,18 +66,18 @@ export default function LoginScreen() {
               style={styles.logo}
               resizeMode="contain"
             />
-            <Text style={styles.title}>Welcome to Forq</Text>
-            <Text style={styles.subtitle}>Track your nutrition, reach your goals</Text>
+            <Text style={[styles.title, { color: colors.text }]}>Welcome to Forq</Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Track your nutrition, reach your goals</Text>
           </View>
 
           {/* Login Form */}
           <View style={styles.form}>
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email or Username</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Email or Username</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
                 placeholder="Enter your email or username"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.textTertiary}
                 value={emailOrUsername}
                 onChangeText={setEmailOrUsername}
                 autoCapitalize="none"
@@ -83,11 +87,11 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Password</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Password</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
                 placeholder="Enter your password"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.textTertiary}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -97,7 +101,7 @@ export default function LoginScreen() {
             </View>
 
             <TouchableOpacity
-              style={[styles.loginButton, loading && styles.buttonDisabled]}
+              style={[styles.loginButton, { backgroundColor: colors.primary }, loading && styles.buttonDisabled]}
               onPress={handleLogin}
               disabled={loading}
             >
@@ -110,9 +114,9 @@ export default function LoginScreen() {
 
             {/* Signup Link */}
             <View style={styles.signupContainer}>
-              <Text style={styles.signupText}>Don't have an account? </Text>
+              <Text style={[styles.signupText, { color: colors.textSecondary }]}>Don't have an account? </Text>
               <TouchableOpacity onPress={navigateToSignup} disabled={loading}>
-                <Text style={styles.signupLink}>Sign Up</Text>
+                <Text style={[styles.signupLink, { color: colors.primary }]}>Sign Up</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -125,7 +129,6 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
   },
   content: {
     flex: 1,
@@ -144,12 +147,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#fff',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#999',
   },
   form: {
     width: '100%',
@@ -160,20 +161,15 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#fff',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#2a2a2a',
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    color: '#fff',
     borderWidth: 1,
-    borderColor: '#3a3a3a',
   },
   loginButton: {
-    backgroundColor: '#007AFF',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -193,11 +189,9 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   signupText: {
-    color: '#999',
     fontSize: 14,
   },
   signupLink: {
-    color: '#007AFF',
     fontSize: 14,
     fontWeight: '600',
   },

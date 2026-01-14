@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
+import { Appearance } from 'react-native';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme() ?? 'light';
@@ -12,6 +13,7 @@ export default function ProfileScreen() {
   const router = useRouter();
 
   const { dailyGoals, user, logoutUser } = useApp();
+  const [showThemeModal, setShowThemeModal] = useState(false);
 
   const handleLogout = () => {
     Alert.alert(
@@ -143,23 +145,28 @@ export default function ProfileScreen() {
 
           <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => setShowThemeModal(true)}>
             <View style={styles.settingLabel}>
               <Ionicons name="moon-outline" size={24} color={colors.text} />
               <Text style={[styles.settingText, { color: colors.text }]}>Theme</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
+            <View style={styles.settingRight}>
+              <Text style={[styles.settingValue, { color: colors.textSecondary }]}>
+                {colorScheme === 'dark' ? 'Dark' : 'Light'}
+              </Text>
+              <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
+            </View>
           </TouchableOpacity>
 
           <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
-          <TouchableOpacity style={styles.settingRow}>
+          {/* <TouchableOpacity style={styles.settingRow}>
             <View style={styles.settingLabel}>
               <Ionicons name="language-outline" size={24} color={colors.text} />
               <Text style={[styles.settingText, { color: colors.text }]}>Language</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
@@ -202,6 +209,79 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.footer} />
+
+      {/* Theme Modal */}
+      <Modal
+        visible={showThemeModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowThemeModal(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowThemeModal(false)}
+        >
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Choose Theme</Text>
+              <TouchableOpacity onPress={() => setShowThemeModal(false)}>
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={[
+                styles.themeOption,
+                { borderColor: colors.border },
+                colorScheme === 'light' && { backgroundColor: colors.primaryLight || colors.primary + '20' }
+              ]}
+              onPress={() => {
+                Appearance.setColorScheme('light');
+                setShowThemeModal(false);
+              }}
+            >
+              <Ionicons name="sunny" size={24} color={colors.text} />
+              <Text style={[styles.themeOptionText, { color: colors.text }]}>Light</Text>
+              {colorScheme === 'light' && (
+                <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.themeOption,
+                { borderColor: colors.border },
+                colorScheme === 'dark' && { backgroundColor: colors.primaryLight || colors.primary + '20' }
+              ]}
+              onPress={() => {
+                Appearance.setColorScheme('dark');
+                setShowThemeModal(false);
+              }}
+            >
+              <Ionicons name="moon" size={24} color={colors.text} />
+              <Text style={[styles.themeOptionText, { color: colors.text }]}>Dark</Text>
+              {colorScheme === 'dark' && (
+                <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.themeOption,
+                { borderColor: colors.border },
+              ]}
+              onPress={() => {
+                Appearance.setColorScheme(null);
+                setShowThemeModal(false);
+              }}
+            >
+              <Ionicons name="phone-portrait" size={24} color={colors.text} />
+              <Text style={[styles.themeOptionText, { color: colors.text }]}>System Default</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </ScrollView>
   );
 }
@@ -292,8 +372,51 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
+  settingRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  settingValue: {
+    fontSize: 14,
+  },
   settingText: {
     fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    paddingBottom: 40,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  themeOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 12,
+    gap: 12,
+  },
+  themeOptionText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
   },
   aboutRow: {
     flexDirection: 'row',

@@ -17,10 +17,14 @@ import {
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useApp } from '@/context/AppContext';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from '@/constants/colors';
 
 export default function SignupScreen() {
   const router = useRouter();
   const { registerUser } = useApp();
+  const colorScheme = useColorScheme() ?? 'light';
+  const colors = Colors[colorScheme];
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -90,10 +94,10 @@ export default function SignupScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <StatusBar style="light" />
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -107,20 +111,20 @@ export default function SignupScreen() {
                 style={styles.logo}
                 resizeMode="contain"
               />
-              <Text style={styles.title}>Create Account</Text>
-              <Text style={styles.subtitle}>Start your nutrition journey today</Text>
+            <Text style={[styles.title, { color: colors.text }]}>Create Account</Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Start your nutrition journey today</Text>
             </View>
 
             {/* Signup Form */}
             <View style={styles.form}>
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>
+                <Text style={[styles.label, { color: colors.text }]}>
                   Username <Text style={styles.required}>*</Text>
                 </Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
                   placeholder="Choose a username"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.textTertiary}
                   value={formData.username}
                   onChangeText={(value) => updateField('username', value)}
                   autoCapitalize="none"
@@ -130,13 +134,13 @@ export default function SignupScreen() {
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>
+                <Text style={[styles.label, { color: colors.text }]}>
                   Email <Text style={styles.required}>*</Text>
                 </Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
                   placeholder="Enter your email"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.textTertiary}
                   value={formData.email}
                   onChangeText={(value) => updateField('email', value)}
                   autoCapitalize="none"
@@ -148,11 +152,11 @@ export default function SignupScreen() {
 
               <View style={styles.row}>
                 <View style={[styles.inputContainer, styles.halfWidth]}>
-                  <Text style={styles.label}>First Name</Text>
+                  <Text style={[styles.label, { color: colors.text }]}>First Name</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
                     placeholder="First name"
-                    placeholderTextColor="#999"
+                    placeholderTextColor={colors.textTertiary}
                     value={formData.firstName}
                     onChangeText={(value) => updateField('firstName', value)}
                     autoCapitalize="words"
@@ -161,11 +165,11 @@ export default function SignupScreen() {
                 </View>
 
                 <View style={[styles.inputContainer, styles.halfWidth]}>
-                  <Text style={styles.label}>Last Name</Text>
+                  <Text style={[styles.label, { color: colors.text }]}>Last Name</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
                     placeholder="Last name"
-                    placeholderTextColor="#999"
+                    placeholderTextColor={colors.textTertiary}
                     value={formData.lastName}
                     onChangeText={(value) => updateField('lastName', value)}
                     autoCapitalize="words"
@@ -175,13 +179,13 @@ export default function SignupScreen() {
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>
+                <Text style={[styles.label, { color: colors.text }]}>
                   Password <Text style={styles.required}>*</Text>
                 </Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
                   placeholder="Create a password (min. 6 characters)"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.textTertiary}
                   value={formData.password}
                   onChangeText={(value) => updateField('password', value)}
                   secureTextEntry
@@ -191,13 +195,13 @@ export default function SignupScreen() {
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>
+                <Text style={[styles.label, { color: colors.text }]}>
                   Confirm Password <Text style={styles.required}>*</Text>
                 </Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
                   placeholder="Re-enter your password"
-                  placeholderTextColor="#999"
+                  placeholderTextColor={colors.textTertiary}
                   value={formData.confirmPassword}
                   onChangeText={(value) => updateField('confirmPassword', value)}
                   secureTextEntry
@@ -207,7 +211,7 @@ export default function SignupScreen() {
               </View>
 
               <TouchableOpacity
-                style={[styles.signupButton, loading && styles.buttonDisabled]}
+                style={[styles.signupButton, { backgroundColor: colors.primary }, loading && styles.buttonDisabled]}
                 onPress={handleSignup}
                 disabled={loading}
               >
@@ -220,9 +224,9 @@ export default function SignupScreen() {
 
               {/* Login Link */}
               <View style={styles.loginContainer}>
-                <Text style={styles.loginText}>Already have an account? </Text>
+                <Text style={[styles.loginText, { color: colors.textSecondary }]}>Already have an account? </Text>
                 <TouchableOpacity onPress={navigateToLogin} disabled={loading}>
-                  <Text style={styles.loginLink}>Login</Text>
+                  <Text style={[styles.loginLink, { color: colors.primary }]}>Login</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -236,7 +240,6 @@ export default function SignupScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
   },
   scrollContent: {
     flexGrow: 1,
@@ -258,12 +261,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: '#999',
   },
   form: {
     width: '100%',
@@ -282,23 +283,18 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#fff',
     marginBottom: 8,
   },
   required: {
     color: '#FF3B30',
   },
   input: {
-    backgroundColor: '#2a2a2a',
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    color: '#fff',
     borderWidth: 1,
-    borderColor: '#3a3a3a',
   },
   signupButton: {
-    backgroundColor: '#007AFF',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -319,11 +315,9 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   loginText: {
-    color: '#999',
     fontSize: 14,
   },
   loginLink: {
-    color: '#007AFF',
     fontSize: 14,
     fontWeight: '600',
   },

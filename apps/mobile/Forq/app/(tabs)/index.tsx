@@ -83,7 +83,10 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View>
           <Text style={[styles.greeting, { color: colors.text }]}>
-            {isToday() ? 'Today' : formatDateShort(selectedDate)}
+            {isToday()
+              ? `Today, ${selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+              : formatDateShort(selectedDate)
+            }
           </Text>
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             Track your nutrition journey
