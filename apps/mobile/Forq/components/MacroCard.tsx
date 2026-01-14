@@ -60,7 +60,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     flex: 1,
-    minWidth: 140,
+    minWidth: '45%',
+    maxWidth: '48%',
   },
   label: {
     fontSize: 12,

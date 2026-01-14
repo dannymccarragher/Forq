@@ -68,6 +68,11 @@ interface AppContextType {
     fat: number;
   };
   setDailyGoals: (goals: { calories: number; protein: number; carbs: number; fat: number }) => void;
+
+  // Macro preferences
+  selectedMacros: ('protein' | 'carbs' | 'fat' | 'calories')[];
+  setSelectedMacros: (macros: ('protein' | 'carbs' | 'fat' | 'calories')[]) => void;
+  hasSelectedMacros: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -85,6 +90,8 @@ interface AppProviderProps {
 }
 
 const SECURE_STORE_KEY = 'forq_user_id';
+const MACRO_PREFERENCES_KEY = 'forq_macro_preferences';
+const ONBOARDING_COMPLETE_KEY = 'forq_onboarding_complete';
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // Auth state
@@ -117,6 +124,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   });
   const [loadingGoals, setLoadingGoals] = useState(false);
 
+  // Macro preferences state
+  const [selectedMacros, setSelectedMacrosState] = useState<('protein' | 'carbs' | 'fat' | 'calories')[]>([]);
+  const [hasSelectedMacros, setHasSelectedMacros] = useState(false);
+
   // Check for existing session on mount
   useEffect(() => {
     checkAuthStatus();
@@ -128,13 +139,17 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       const storedUserId = await SecureStore.getItemAsync(SECURE_STORE_KEY);
 
       if (storedUserId) {
+        const userIdNum = parseInt(storedUserId);
         // Verify with backend
-        const response = await api.verifyUser(parseInt(storedUserId));
+        const response = await api.verifyUser(userIdNum);
 
         if (response.success && response.user) {
           setUser(response.user);
           setUserId(response.user.id);
           setIsAuthenticated(true);
+
+          // Load macro preferences before finishing loading
+          await loadMacroPreferencesForUser(userIdNum);
         } else {
           // Invalid session, clear storage
           await SecureStore.deleteItemAsync(SECURE_STORE_KEY);
@@ -161,6 +176,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setUser(response.user);
         setUserId(response.user.id);
         setIsAuthenticated(true);
+
+        // Load macro preferences for this user
+        await loadMacroPreferencesForUser(response.user.id);
       }
     } catch (error) {
       console.error('Login failed:', error);
@@ -186,6 +204,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setUser(response.user);
         setUserId(response.user.id);
         setIsAuthenticated(true);
+
+        // New user - no macro preferences yet
+        setSelectedMacrosState(['protein', 'carbs', 'fat', 'calories']);
+        setHasSelectedMacros(false);
       }
     } catch (error) {
       console.error('Registration failed:', error);
@@ -196,7 +218,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // Logout user
   const logoutUser = async () => {
     try {
-      // Clear secure storage
+      // Clear secure storage (but keep user-specific preferences like macros for when they log back in)
       await SecureStore.deleteItemAsync(SECURE_STORE_KEY);
 
       // Clear state
@@ -206,8 +228,55 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       setDailySummary(null);
       setFoodLogs([]);
       setFavorites([]);
+      setSelectedMacrosState([]);
+      setHasSelectedMacros(false);
     } catch (error) {
       console.error('Logout failed:', error);
+    }
+  };
+
+  // Load macro preferences for a specific user
+  const loadMacroPreferencesForUser = async (userIdToLoad: number) => {
+    try {
+      const onboardingComplete = await SecureStore.getItemAsync(`${ONBOARDING_COMPLETE_KEY}_${userIdToLoad}`);
+      const stored = await SecureStore.getItemAsync(`${MACRO_PREFERENCES_KEY}_${userIdToLoad}`);
+
+      if (stored) {
+        const macros = JSON.parse(stored);
+        setSelectedMacrosState(macros);
+        setHasSelectedMacros(true);
+      } else if (onboardingComplete === 'true') {
+        // User has completed onboarding but no preferences stored (shouldn't happen, but handle it)
+        setSelectedMacrosState(['protein', 'carbs', 'fat', 'calories']);
+        setHasSelectedMacros(true);
+      } else {
+        // New user who hasn't completed onboarding
+        setSelectedMacrosState(['protein', 'carbs', 'fat', 'calories']);
+        setHasSelectedMacros(false);
+      }
+    } catch (error) {
+      console.error('Failed to load macro preferences:', error);
+      setSelectedMacrosState(['protein', 'carbs', 'fat', 'calories']);
+      setHasSelectedMacros(false);
+    }
+  };
+
+  // Load macro preferences
+  const loadMacroPreferences = async () => {
+    if (userId > 0) {
+      await loadMacroPreferencesForUser(userId);
+    }
+  };
+
+  // Set macro preferences
+  const setSelectedMacros = async (macros: ('protein' | 'carbs' | 'fat' | 'calories')[]) => {
+    try {
+      await SecureStore.setItemAsync(`${MACRO_PREFERENCES_KEY}_${userId}`, JSON.stringify(macros));
+      await SecureStore.setItemAsync(`${ONBOARDING_COMPLETE_KEY}_${userId}`, 'true');
+      setSelectedMacrosState(macros);
+      setHasSelectedMacros(true);
+    } catch (error) {
+      console.error('Failed to save macro preferences:', error);
     }
   };
 
@@ -409,6 +478,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     deleteFoodLog,
     dailyGoals,
     setDailyGoals: saveGoals,
+    selectedMacros,
+    setSelectedMacros,
+    hasSelectedMacros,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

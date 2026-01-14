@@ -13,7 +13,7 @@ export const unstable_settings = {
 };
 
 function RootLayoutNav() {
-  const { isAuthenticated, isLoading } = useApp();
+  const { isAuthenticated, isLoading, hasSelectedMacros } = useApp();
   const segments = useSegments();
   const router = useRouter();
   const colorScheme = useColorScheme();
@@ -22,15 +22,23 @@ function RootLayoutNav() {
     if (isLoading) return;
 
     const inAuthGroup = segments[0] === 'login' || segments[0] === 'signup';
+    const inOnboarding = segments[0] === 'select-macros' || segments[0] === 'set-goals';
 
     if (!isAuthenticated && !inAuthGroup) {
       // Redirect to login if not authenticated
       router.replace('/login');
     } else if (isAuthenticated && inAuthGroup) {
-      // Redirect to main app if authenticated
-      router.replace('/(tabs)');
+      // Check if user needs onboarding
+      if (!hasSelectedMacros) {
+        router.replace('/select-macros');
+      } else {
+        router.replace('/(tabs)');
+      }
+    } else if (isAuthenticated && !hasSelectedMacros && !inOnboarding) {
+      // Redirect to macro selection if not yet completed onboarding
+      router.replace('/select-macros');
     }
-  }, [isAuthenticated, isLoading, segments]);
+  }, [isAuthenticated, isLoading, hasSelectedMacros, segments]);
 
   if (isLoading) {
     return (
@@ -45,6 +53,8 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="signup" options={{ headerShown: false }} />
+        <Stack.Screen name="select-macros" options={{ headerShown: false }} />
+        <Stack.Screen name="set-goals" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"
