@@ -31,9 +31,8 @@ interface AppContextType {
   }) => Promise<void>;
   logoutUser: () => Promise<void>;
 
-  // User state (deprecated - use user.id instead)
+  // User ID derived from authenticated user
   userId: number;
-  setUserId: (id: number) => void;
 
   // Current date for logging
   selectedDate: Date;
@@ -98,10 +97,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [user, setUser] = useState<User | null>(null);
-
-  // For demo purposes, using hardcoded userId. In production, get from auth
-  const [userId, setUserId] = useState<number>(0);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  // Derive userId from authenticated user
+  const userId = user?.id || 0;
 
   // Summary state
   const [dailySummary, setDailySummary] = useState<NutritionalSummary | null>(null);
@@ -145,11 +144,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
         if (response.success && response.user) {
           setUser(response.user);
-          setUserId(response.user.id);
           setIsAuthenticated(true);
 
           // Load macro preferences before finishing loading
-          await loadMacroPreferencesForUser(userIdNum);
+          await loadMacroPreferencesForUser(response.user.id);
         } else {
           // Invalid session, clear storage
           await SecureStore.deleteItemAsync(SECURE_STORE_KEY);
@@ -174,7 +172,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         await SecureStore.setItemAsync(SECURE_STORE_KEY, response.user.id.toString());
 
         setUser(response.user);
-        setUserId(response.user.id);
         setIsAuthenticated(true);
 
         // Load macro preferences for this user
@@ -202,7 +199,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         await SecureStore.setItemAsync(SECURE_STORE_KEY, response.user.id.toString());
 
         setUser(response.user);
-        setUserId(response.user.id);
         setIsAuthenticated(true);
 
         // New user - no macro preferences yet
@@ -223,7 +219,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
       // Clear state
       setUser(null);
-      setUserId(0);
       setIsAuthenticated(false);
       setDailySummary(null);
       setFoodLogs([]);
@@ -460,7 +455,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     registerUser,
     logoutUser,
     userId,
-    setUserId,
     selectedDate,
     setSelectedDate,
     dailySummary,
