@@ -1646,11 +1646,12 @@ const styles = StyleSheet.create({
   modalContent: {
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    padding: 24,
-    maxHeight: '90%',
+    paddingTop: 24,
+    paddingHorizontal: 24,
+    paddingBottom: 40,
   },
   formScrollView: {
-    maxHeight: 500,
+    maxHeight: 600,
   },
   formScrollContent: {
     paddingBottom: 20,
