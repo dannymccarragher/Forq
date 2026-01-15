@@ -7,6 +7,7 @@ import { Colors } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 import { FoodLogCard } from '@/components/FoodLogCard';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { MacroProgressBar } from '@/components/MacroProgressBar';
 import { formatDateShort } from '@/utils/formatters';
 
 export default function DiaryScreen() {
@@ -24,6 +25,7 @@ export default function DiaryScreen() {
     foodLogs,
     deleteFoodLog,
     selectedMacros,
+    dailyGoals,
   } = useApp();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -65,6 +67,13 @@ export default function DiaryScreen() {
     return <LoadingSpinner message="Loading your food diary..." />;
   }
 
+  const currentCalories = dailySummary?.totals.calories || 0;
+  const currentProtein = dailySummary?.totals.protein || 0;
+  const currentCarbs = dailySummary?.totals.carbs || 0;
+  const currentFat = dailySummary?.totals.fat || 0;
+  const currentFiber = dailySummary?.totals.fiber || 0;
+  const currentWater = dailySummary?.totals.water || 0;
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -97,23 +106,73 @@ export default function DiaryScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Summary Card */}
-      <View style={[styles.summaryCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <View style={styles.summaryRow}>
-          <View style={styles.summaryItem}>
-            <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Total Calories</Text>
-            <Text style={[styles.summaryValue, { color: colors.text }]}>
-              {dailySummary?.totals.calories || 0}
-            </Text>
+      {/* Macro Progress Bars */}
+      {selectedMacros.length > 0 && (
+        <View style={styles.macrosSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Daily Progress</Text>
+            <TouchableOpacity onPress={() => router.push('/select-macros')}>
+              <Ionicons name="settings-outline" size={20} color={colors.textSecondary} />
+            </TouchableOpacity>
           </View>
-          <View style={styles.summaryItem}>
-            <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Entries</Text>
-            <Text style={[styles.summaryValue, { color: colors.text }]}>
-              {dailySummary?.totals.entries || 0}
-            </Text>
+          <View style={styles.progressBarsContainer}>
+            {selectedMacros.includes('calories') && (
+              <MacroProgressBar
+                label="Calories"
+                current={currentCalories}
+                goal={dailyGoals.calories}
+                unit="kcal"
+                color={colors.calories}
+              />
+            )}
+            {selectedMacros.includes('protein') && (
+              <MacroProgressBar
+                label="Protein"
+                current={currentProtein}
+                goal={dailyGoals.protein}
+                unit="g"
+                color={colors.protein}
+              />
+            )}
+            {selectedMacros.includes('carbs') && (
+              <MacroProgressBar
+                label="Net Carbs"
+                current={currentCarbs}
+                goal={dailyGoals.carbs}
+                unit="g"
+                color={colors.carbs}
+              />
+            )}
+            {selectedMacros.includes('fat') && (
+              <MacroProgressBar
+                label="Fat"
+                current={currentFat}
+                goal={dailyGoals.fat}
+                unit="g"
+                color={colors.fat}
+              />
+            )}
+            {selectedMacros.includes('fiber') && (
+              <MacroProgressBar
+                label="Fiber"
+                current={currentFiber}
+                goal={dailyGoals.fiber}
+                unit="g"
+                color={colors.fiber}
+              />
+            )}
+            {selectedMacros.includes('water') && (
+              <MacroProgressBar
+                label="Water"
+                current={currentWater}
+                goal={dailyGoals.water}
+                unit="ml"
+                color={colors.water}
+              />
+            )}
           </View>
         </View>
-      </View>
+      )}
 
       {/* All Food Entries */}
       <View style={styles.section}>
@@ -197,27 +256,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
   },
-  summaryCard: {
-    marginHorizontal: 20,
+  macrosSection: {
+    paddingHorizontal: 20,
     marginBottom: 20,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
   },
-  summaryRow: {
+  sectionHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  summaryItem: {
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 16,
   },
-  summaryLabel: {
-    fontSize: 14,
-    marginBottom: 4,
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
   },
-  summaryValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  progressBarsContainer: {
+    paddingTop: 4,
   },
   section: {
     paddingHorizontal: 20,

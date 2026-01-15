@@ -97,7 +97,7 @@ export default function ProfileScreen() {
                   {dailyGoals.calories} kcal
                 </Text>
               </View>
-              {(selectedMacros.includes('protein') || selectedMacros.includes('carbs') || selectedMacros.includes('fat')) && (
+              {(selectedMacros.includes('protein') || selectedMacros.includes('carbs') || selectedMacros.includes('fat') || selectedMacros.includes('fiber') || selectedMacros.includes('water')) && (
                 <View style={[styles.divider, { backgroundColor: colors.divider }]} />
               )}
             </>
@@ -114,7 +114,7 @@ export default function ProfileScreen() {
                   {dailyGoals.protein}g
                 </Text>
               </View>
-              {(selectedMacros.includes('carbs') || selectedMacros.includes('fat')) && (
+              {(selectedMacros.includes('carbs') || selectedMacros.includes('fat') || selectedMacros.includes('fiber') || selectedMacros.includes('water')) && (
                 <View style={[styles.divider, { backgroundColor: colors.divider }]} />
               )}
             </>
@@ -131,20 +131,54 @@ export default function ProfileScreen() {
                   {dailyGoals.carbs}g
                 </Text>
               </View>
-              {selectedMacros.includes('fat') && (
+              {(selectedMacros.includes('fat') || selectedMacros.includes('fiber') || selectedMacros.includes('water')) && (
                 <View style={[styles.divider, { backgroundColor: colors.divider }]} />
               )}
             </>
           )}
 
           {selectedMacros.includes('fat') && (
+            <>
+              <View style={styles.goalRow}>
+                <View style={styles.goalLabel}>
+                  <Ionicons name="restaurant" size={20} color={colors.fat} />
+                  <Text style={[styles.goalLabelText, { color: colors.text }]}>Fat</Text>
+                </View>
+                <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
+                  {dailyGoals.fat}g
+                </Text>
+              </View>
+              {(selectedMacros.includes('fiber') || selectedMacros.includes('water')) && (
+                <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+              )}
+            </>
+          )}
+
+          {selectedMacros.includes('fiber') && (
+            <>
+              <View style={styles.goalRow}>
+                <View style={styles.goalLabel}>
+                  <Ionicons name="leaf" size={20} color={colors.fiber} />
+                  <Text style={[styles.goalLabelText, { color: colors.text }]}>Fiber</Text>
+                </View>
+                <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
+                  {dailyGoals.fiber}g
+                </Text>
+              </View>
+              {selectedMacros.includes('water') && (
+                <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+              )}
+            </>
+          )}
+
+          {selectedMacros.includes('water') && (
             <View style={styles.goalRow}>
               <View style={styles.goalLabel}>
-                <Ionicons name="water" size={20} color={colors.fat} />
-                <Text style={[styles.goalLabelText, { color: colors.text }]}>Fat</Text>
+                <Ionicons name="water" size={20} color={colors.water} />
+                <Text style={[styles.goalLabelText, { color: colors.text }]}>Water</Text>
               </View>
               <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
-                {dailyGoals.fat}g
+                {dailyGoals.water}ml
               </Text>
             </View>
           )}

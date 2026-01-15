@@ -44,7 +44,7 @@ export default function GoalsScreen() {
     setEditing(false);
   };
 
-  const updateGoal = (key: 'calories' | 'protein' | 'carbs' | 'fat', value: string) => {
+  const updateGoal = (key: 'calories' | 'protein' | 'carbs' | 'fat' | 'fiber' | 'water', value: string) => {
     const numValue = parseInt(value) || 0;
     setTempGoals({ ...tempGoals, [key]: numValue });
   };
@@ -116,7 +116,7 @@ export default function GoalsScreen() {
         )}
 
         {/* Macronutrients Goals */}
-        {(selectedMacros.includes('protein') || selectedMacros.includes('carbs') || selectedMacros.includes('fat')) && (
+        {(selectedMacros.includes('protein') || selectedMacros.includes('carbs') || selectedMacros.includes('fat') || selectedMacros.includes('fiber') || selectedMacros.includes('water')) && (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Macronutrient Goals</Text>
 
@@ -199,7 +199,7 @@ export default function GoalsScreen() {
               <View style={[styles.macroCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                 <View style={styles.macroHeader}>
                   <View style={[styles.macroIconSmall, { backgroundColor: colors.fat + '20' }]}>
-                    <Ionicons name="water" size={24} color={colors.fat} />
+                    <Ionicons name="restaurant" size={24} color={colors.fat} />
                   </View>
                   <View style={styles.macroInfo}>
                     <Text style={[styles.macroLabel, { color: colors.textSecondary }]}>Fat</Text>
@@ -226,6 +226,68 @@ export default function GoalsScreen() {
                       {percentages.fat}%
                     </Text>
                     <Text style={[styles.percentageLabel, { color: colors.textTertiary }]}>of calories</Text>
+                  </View>
+                </View>
+              </View>
+            )}
+
+            {/* Fiber */}
+            {selectedMacros.includes('fiber') && (
+              <View style={[styles.macroCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={styles.macroHeader}>
+                  <View style={[styles.macroIconSmall, { backgroundColor: colors.fiber + '20' }]}>
+                    <Ionicons name="leaf" size={24} color={colors.fiber} />
+                  </View>
+                  <View style={styles.macroInfo}>
+                    <Text style={[styles.macroLabel, { color: colors.textSecondary }]}>Fiber</Text>
+                    {editing ? (
+                      <View style={styles.inputRow}>
+                        <TextInput
+                          style={[styles.macroInput, { color: colors.text, borderColor: colors.border }]}
+                          value={tempGoals.fiber.toString()}
+                          onChangeText={(text) => updateGoal('fiber', text)}
+                          keyboardType="numeric"
+                          placeholder="30"
+                          placeholderTextColor={colors.textTertiary}
+                        />
+                        <Text style={[styles.inputUnit, { color: colors.textSecondary }]}>g</Text>
+                      </View>
+                    ) : (
+                      <Text style={[styles.macroValue, { color: colors.text }]}>
+                        {dailyGoals.fiber}g
+                      </Text>
+                    )}
+                  </View>
+                </View>
+              </View>
+            )}
+
+            {/* Water */}
+            {selectedMacros.includes('water') && (
+              <View style={[styles.macroCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={styles.macroHeader}>
+                  <View style={[styles.macroIconSmall, { backgroundColor: colors.water + '20' }]}>
+                    <Ionicons name="water" size={24} color={colors.water} />
+                  </View>
+                  <View style={styles.macroInfo}>
+                    <Text style={[styles.macroLabel, { color: colors.textSecondary }]}>Water</Text>
+                    {editing ? (
+                      <View style={styles.inputRow}>
+                        <TextInput
+                          style={[styles.macroInput, { color: colors.text, borderColor: colors.border }]}
+                          value={tempGoals.water.toString()}
+                          onChangeText={(text) => updateGoal('water', text)}
+                          keyboardType="numeric"
+                          placeholder="2000"
+                          placeholderTextColor={colors.textTertiary}
+                        />
+                        <Text style={[styles.inputUnit, { color: colors.textSecondary }]}>ml</Text>
+                      </View>
+                    ) : (
+                      <Text style={[styles.macroValue, { color: colors.text }]}>
+                        {dailyGoals.water}ml
+                      </Text>
+                    )}
                   </View>
                 </View>
               </View>

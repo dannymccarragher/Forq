@@ -208,7 +208,7 @@ export default function FoodDetailScreen() {
       );
 
       Alert.alert('Success', 'Food logged successfully!', [
-        { text: 'OK', onPress: () => router.replace('/(tabs)') },
+        { text: 'OK', onPress: () => router.replace('/(tabs)/diary') },
       ]);
     } catch (error) {
       console.error('Failed to save and log food:', error);

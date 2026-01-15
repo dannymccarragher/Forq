@@ -93,7 +93,12 @@ export default function SelectMacrosScreen() {
   };
 
   const handleSave = async () => {
-    await setSelectedMacros(Array.from(selected));
+    const macrosArray = Array.from(selected);
+    await setSelectedMacros(macrosArray);
+
+    // Add a small delay to ensure context is updated
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     if (hasSelectedMacros) {
       // User is editing, go back
       router.back();

@@ -45,6 +45,18 @@ export default function SetGoalsScreen() {
     water: dailyGoals.water.toString(),
   });
 
+  // Update goals when dailyGoals changes
+  useEffect(() => {
+    setGoals({
+      calories: dailyGoals.calories.toString(),
+      protein: dailyGoals.protein.toString(),
+      carbs: dailyGoals.carbs.toString(),
+      fat: dailyGoals.fat.toString(),
+      fiber: dailyGoals.fiber.toString(),
+      water: dailyGoals.water.toString(),
+    });
+  }, [dailyGoals]);
+
   const macroGoalInputs: MacroGoalInput[] = [
     {
       id: 'calories',
