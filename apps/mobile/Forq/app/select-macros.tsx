@@ -13,7 +13,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 
-type MacroType = 'protein' | 'carbs' | 'fat' | 'calories';
+type MacroType = 'protein' | 'carbs' | 'fat' | 'calories' | 'fiber' | 'water';
 
 interface MacroOption {
   id: MacroType;
@@ -30,7 +30,7 @@ export default function SelectMacrosScreen() {
   const { selectedMacros, setSelectedMacros, hasSelectedMacros } = useApp();
 
   const [selected, setSelected] = useState<Set<MacroType>>(
-    new Set(selectedMacros || ['protein', 'carbs', 'fat', 'calories'])
+    new Set(selectedMacros || ['protein', 'carbs', 'fat', 'calories', 'fiber', 'water'])
   );
 
   const macroOptions: MacroOption[] = [
@@ -51,7 +51,7 @@ export default function SelectMacrosScreen() {
     {
       id: 'fat',
       label: 'Fat',
-      icon: 'water',
+      icon: 'restaurant',
       description: 'Keep track of your fat intake',
       color: colors.fat,
     },
@@ -61,6 +61,20 @@ export default function SelectMacrosScreen() {
       icon: 'flame',
       description: 'Monitor your calorie consumption',
       color: colors.calories,
+    },
+    {
+      id: 'fiber',
+      label: 'Fiber',
+      icon: 'leaf',
+      description: 'Track your daily fiber intake',
+      color: colors.fiber,
+    },
+    {
+      id: 'water',
+      label: 'Water',
+      icon: 'water',
+      description: 'Monitor your daily water consumption',
+      color: colors.water,
     },
   ];
 
@@ -103,7 +117,7 @@ export default function SelectMacrosScreen() {
             {hasSelectedMacros ? 'Edit Your Macros' : 'Choose Your Macros'}
           </Text>
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            {hasSelectedMacros 
+            {hasSelectedMacros
               ? 'Select which macronutrients you want to track on your dashboard'
               : 'Select which macronutrients you want to track. You can change this anytime in settings.'
             }
@@ -119,8 +133,8 @@ export default function SelectMacrosScreen() {
                 key={macro.id}
                 style={[
                   styles.macroCard,
-                  { 
-                    backgroundColor: colors.surface, 
+                  {
+                    backgroundColor: colors.surface,
                     borderColor: isSelected ? macro.color : colors.border,
                     borderWidth: isSelected ? 2 : 1,
                   },

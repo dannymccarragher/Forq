@@ -14,6 +14,8 @@ interface User {
   goalProtein?: number;
   goalCarbs?: number;
   goalFat?: number;
+  goalFiber?: number;
+  goalWater?: number;
 }
 
 interface AppContextType {
@@ -65,12 +67,14 @@ interface AppContextType {
     protein: number;
     carbs: number;
     fat: number;
+    fiber: number;
+    water: number;
   };
-  setDailyGoals: (goals: { calories: number; protein: number; carbs: number; fat: number }) => void;
+  setDailyGoals: (goals: { calories: number; protein: number; carbs: number; fat: number; fiber: number; water: number }) => void;
 
   // Macro preferences
-  selectedMacros: ('protein' | 'carbs' | 'fat' | 'calories')[];
-  setSelectedMacros: (macros: ('protein' | 'carbs' | 'fat' | 'calories')[]) => void;
+  selectedMacros: ('protein' | 'carbs' | 'fat' | 'calories' | 'fiber' | 'water')[];
+  setSelectedMacros: (macros: ('protein' | 'carbs' | 'fat' | 'calories' | 'fiber' | 'water')[]) => void;
   hasSelectedMacros: boolean;
 }
 
@@ -120,11 +124,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     protein: 150,
     carbs: 250,
     fat: 65,
+    fiber: 30,
+    water: 2000,
   });
   const [loadingGoals, setLoadingGoals] = useState(false);
 
   // Macro preferences state
-  const [selectedMacros, setSelectedMacrosState] = useState<('protein' | 'carbs' | 'fat' | 'calories')[]>([]);
+  const [selectedMacros, setSelectedMacrosState] = useState<('protein' | 'carbs' | 'fat' | 'calories' | 'fiber' | 'water')[]>([]);
   const [hasSelectedMacros, setHasSelectedMacros] = useState(false);
 
   // Check for existing session on mount
@@ -202,7 +208,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setIsAuthenticated(true);
 
         // New user - no macro preferences yet
-        setSelectedMacrosState(['protein', 'carbs', 'fat', 'calories']);
+        setSelectedMacrosState(['protein', 'carbs', 'fat', 'calories', 'fiber', 'water']);
         setHasSelectedMacros(false);
       }
     } catch (error) {
@@ -242,16 +248,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setHasSelectedMacros(true);
       } else if (onboardingComplete === 'true') {
         // User has completed onboarding but no preferences stored (shouldn't happen, but handle it)
-        setSelectedMacrosState(['protein', 'carbs', 'fat', 'calories']);
+        setSelectedMacrosState(['protein', 'carbs', 'fat', 'calories', 'fiber', 'water']);
         setHasSelectedMacros(true);
       } else {
         // New user who hasn't completed onboarding
-        setSelectedMacrosState(['protein', 'carbs', 'fat', 'calories']);
+        setSelectedMacrosState(['protein', 'carbs', 'fat', 'calories', 'fiber', 'water']);
         setHasSelectedMacros(false);
       }
     } catch (error) {
       console.error('Failed to load macro preferences:', error);
-      setSelectedMacrosState(['protein', 'carbs', 'fat', 'calories']);
+      setSelectedMacrosState(['protein', 'carbs', 'fat', 'calories', 'fiber', 'water']);
       setHasSelectedMacros(false);
     }
   };
@@ -264,7 +270,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   // Set macro preferences
-  const setSelectedMacros = async (macros: ('protein' | 'carbs' | 'fat' | 'calories')[]) => {
+  const setSelectedMacros = async (macros: ('protein' | 'carbs' | 'fat' | 'calories' | 'fiber' | 'water')[]) => {
     try {
       await SecureStore.setItemAsync(`${MACRO_PREFERENCES_KEY}_${userId}`, JSON.stringify(macros));
       await SecureStore.setItemAsync(`${ONBOARDING_COMPLETE_KEY}_${userId}`, 'true');
@@ -407,7 +413,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setLoadingGoals(true);
     try {
       const response = await api.getUserGoals(userId);
-      setDailyGoals(response.goals);
+      setDailyGoals({
+        calories: response.goals.calories || 2000,
+        protein: response.goals.protein || 150,
+        carbs: response.goals.carbs || 250,
+        fat: response.goals.fat || 65,
+        fiber: response.goals.fiber || 30,
+        water: response.goals.water || 2000,
+      });
     } catch (error) {
       console.error('Failed to load goals:', error);
       // Keep default goals on error
@@ -417,12 +430,19 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   // Save goals to database
-  const saveGoals = async (goals: { calories: number; protein: number; carbs: number; fat: number }) => {
+  const saveGoals = async (goals: { calories: number; protein: number; carbs: number; fat: number; fiber: number; water: number }) => {
     if (!userId) return;
 
     try {
       const response = await api.updateUserGoals(userId, goals);
-      setDailyGoals(response.goals);
+      setDailyGoals({
+        calories: response.goals.calories || goals.calories,
+        protein: response.goals.protein || goals.protein,
+        carbs: response.goals.carbs || goals.carbs,
+        fat: response.goals.fat || goals.fat,
+        fiber: response.goals.fiber || goals.fiber,
+        water: response.goals.water || goals.water,
+      });
     } catch (error) {
       console.error('Failed to save goals:', error);
       throw error;

@@ -35,6 +35,8 @@ export const Colors = {
     carbs: '#FF9800',
     fat: '#9C27B0',
     calories: '#4CAF50',
+    fiber: '#8D6E63',
+    water: '#2196F3',
   },
   dark: {
     primary: '#66BB6A',
@@ -71,5 +73,7 @@ export const Colors = {
     carbs: '#FFB74D',
     fat: '#BA68C8',
     calories: '#66BB6A',
+    fiber: '#A1887F',
+    water: '#64B5F6',
   },
 };

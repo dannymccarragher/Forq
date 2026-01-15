@@ -385,7 +385,7 @@ export async function updateUserProfile(
  */
 export async function getUserGoals(
   userId: number
-): Promise<{ success: boolean; goals: { calories: number; protein: number; carbs: number; fat: number } }> {
+): Promise<{ success: boolean; goals: { calories: number; protein: number; carbs: number; fat: number; fiber: number; water: number } }> {
   return request(`/api/db/users/${userId}/goals`);
 }
 
@@ -399,8 +399,10 @@ export async function updateUserGoals(
     protein: number;
     carbs: number;
     fat: number;
+    fiber: number;
+    water: number;
   }
-): Promise<{ success: boolean; message: string; goals: { calories: number; protein: number; carbs: number; fat: number } }> {
+): Promise<{ success: boolean; message: string; goals: { calories: number; protein: number; carbs: number; fat: number; fiber: number; water: number } }> {
   return request(`/api/db/users/${userId}/goals`, {
     method: 'PUT',
     body: JSON.stringify(goals),

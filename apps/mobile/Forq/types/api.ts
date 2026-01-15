@@ -7,6 +7,12 @@ export interface User {
   firstName?: string;
   lastName?: string;
   profilePicture?: string;
+  goalCalories?: number;
+  goalProtein?: number;
+  goalCarbs?: number;
+  goalFat?: number;
+  goalFiber?: number;
+  goalWater?: number;
   createdAt: string;
   updatedAt: string;
 }

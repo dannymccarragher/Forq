@@ -18,7 +18,7 @@ import { Colors } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 import { requestNotificationPermissions, scheduleDailyNotifications } from '@/services/notificationService';
 
-type MacroType = 'protein' | 'carbs' | 'fat' | 'calories';
+type MacroType = 'protein' | 'carbs' | 'fat' | 'calories' | 'fiber' | 'water';
 
 interface MacroGoalInput {
   id: MacroType;
@@ -41,6 +41,8 @@ export default function SetGoalsScreen() {
     protein: dailyGoals.protein.toString(),
     carbs: dailyGoals.carbs.toString(),
     fat: dailyGoals.fat.toString(),
+    fiber: dailyGoals.fiber.toString(),
+    water: dailyGoals.water.toString(),
   });
 
   const macroGoalInputs: MacroGoalInput[] = [
@@ -71,10 +73,26 @@ export default function SetGoalsScreen() {
     {
       id: 'fat',
       label: 'Fat',
-      icon: 'water',
+      icon: 'restaurant',
       unit: 'g',
       defaultValue: 65,
       color: colors.fat,
+    },
+    {
+      id: 'fiber',
+      label: 'Fiber',
+      icon: 'leaf',
+      unit: 'g',
+      defaultValue: 30,
+      color: colors.fiber,
+    },
+    {
+      id: 'water',
+      label: 'Water',
+      icon: 'water',
+      unit: 'ml',
+      defaultValue: 2000,
+      color: colors.water,
     },
   ];
 
@@ -111,6 +129,8 @@ export default function SetGoalsScreen() {
         protein: parseInt(goals.protein) || 150,
         carbs: parseInt(goals.carbs) || 250,
         fat: parseInt(goals.fat) || 65,
+        fiber: parseInt(goals.fiber) || 30,
+        water: parseInt(goals.water) || 2000,
       };
 
       await setDailyGoals(goalsToSave);
