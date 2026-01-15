@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Modal, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Modal, Switch, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -15,7 +15,7 @@ export default function ProfileScreen() {
   const { dailyGoals, user, logoutUser, selectedMacros } = useApp();
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
-  
+
   // Notification settings state
   const [notifications, setNotifications] = useState({
     dailyReminders: true,
@@ -44,6 +44,20 @@ export default function ProfileScreen() {
         },
       ]
     );
+  };
+
+  const handleOpenPrivacyPolicy = async () => {
+    const url = 'https://dannymccarragher.github.io/';
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert('Error', 'Unable to open the privacy policy URL');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An error occurred while opening the privacy policy');
+    }
   };
 
   return (
@@ -212,7 +226,7 @@ export default function ProfileScreen() {
 
           <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity style={styles.settingRow} onPress={handleOpenPrivacyPolicy}>
             <View style={styles.settingLabel}>
               <Ionicons name="document-text-outline" size={24} color={colors.text} />
               <Text style={[styles.settingText, { color: colors.text }]}>Privacy Policy</Text>
@@ -338,7 +352,7 @@ export default function ProfileScreen() {
           onPress={() => setShowNotificationsModal(false)}
         >
           <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
-            <ScrollView 
+            <ScrollView
               style={[styles.notificationsModal, { backgroundColor: colors.surface }]}
               contentContainerStyle={styles.notificationsContent}
             >

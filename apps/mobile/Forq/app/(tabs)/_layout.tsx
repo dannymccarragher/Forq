@@ -14,20 +14,36 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      initialRouteName="home"
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textTertiary,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
-          backgroundColor: 'transparent',
-          borderTopWidth: 0,
+          backgroundColor: colors.surface,
+          borderTopWidth: 1,
+          borderTopColor: colors.border,
           height: 70,
           paddingBottom: 10,
           position: 'absolute',
           elevation: 0,
         },
       }}>
+      <Tabs.Screen
+        name="home"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="diary"
+        options={{
+          title: 'Diary',
+          tabBarIcon: ({ color }) => <Ionicons name="book" size={24} color={color} />,
+        }}
+      />
       <Tabs.Screen
         name="index"
         options={{
@@ -53,9 +69,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="glp-tracker"
+        options={{
+          title: 'GLP-1',
+          tabBarIcon: ({ color }) => <Ionicons name="medkit" size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="explore"
         options={{
-          href: null,
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <Ionicons name="person" size={24} color={color} />,
         }}
       />
     </Tabs>
