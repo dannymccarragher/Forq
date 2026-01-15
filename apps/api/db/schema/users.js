@@ -18,6 +18,10 @@ export const users = mysqlTable("users", {
     goalFiber: decimal("goal_fiber", { precision: 10, scale: 2 }).default("30"),
     goalWater: decimal("goal_water", { precision: 10, scale: 2 }).default("2000"),
 
+    // Privacy Policy acceptance
+    privacyPolicyAccepted: int("privacy_policy_accepted").notNull().default(0), // 0 = false, 1 = true
+    privacyPolicyAcceptedAt: timestamp("privacy_policy_accepted_at"),
+
     createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
     updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`).notNull(),
 });

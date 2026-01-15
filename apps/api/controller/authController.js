@@ -13,12 +13,19 @@ const SALT_ROUNDS = 10;
  */
 router.post("/register", async (req, res) => {
     try {
-        const { username, email, password, firstName, lastName } = req.body;
+        const { username, email, password, firstName, lastName, privacyPolicyAccepted } = req.body;
 
         // Validate required fields
         if (!username || !email || !password) {
             return res.status(400).json({
                 error: "Username, email, and password are required",
+            });
+        }
+
+        // Validate privacy policy acceptance
+        if (!privacyPolicyAccepted) {
+            return res.status(400).json({
+                error: "You must accept the Privacy Policy to create an account",
             });
         }
 
@@ -75,6 +82,8 @@ router.post("/register", async (req, res) => {
                 passwordHash,
                 firstName: firstName || null,
                 lastName: lastName || null,
+                privacyPolicyAccepted: 1,
+                privacyPolicyAcceptedAt: new Date(),
             });
 
         // Fetch created user (without password)
