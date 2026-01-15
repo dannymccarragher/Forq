@@ -82,51 +82,68 @@ export default function ProfileScreen() {
         </View>
 
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <View style={styles.goalRow}>
-            <View style={styles.goalLabel}>
-              <Ionicons name="flame" size={20} color={colors.calories} />
-              <Text style={[styles.goalLabelText, { color: colors.text }]}>Calories</Text>
+          {selectedMacros.includes('calories') && (
+            <>
+              <View style={styles.goalRow}>
+                <View style={styles.goalLabel}>
+                  <Ionicons name="flame" size={20} color={colors.calories} />
+                  <Text style={[styles.goalLabelText, { color: colors.text }]}>Calories</Text>
+                </View>
+                <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
+                  {dailyGoals.calories} kcal
+                </Text>
+              </View>
+              {(selectedMacros.includes('protein') || selectedMacros.includes('carbs') || selectedMacros.includes('fat')) && (
+                <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+              )}
+            </>
+          )}
+
+          {selectedMacros.includes('protein') && (
+            <>
+              <View style={styles.goalRow}>
+                <View style={styles.goalLabel}>
+                  <Ionicons name="nutrition" size={20} color={colors.protein} />
+                  <Text style={[styles.goalLabelText, { color: colors.text }]}>Protein</Text>
+                </View>
+                <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
+                  {dailyGoals.protein}g
+                </Text>
+              </View>
+              {(selectedMacros.includes('carbs') || selectedMacros.includes('fat')) && (
+                <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+              )}
+            </>
+          )}
+
+          {selectedMacros.includes('carbs') && (
+            <>
+              <View style={styles.goalRow}>
+                <View style={styles.goalLabel}>
+                  <Ionicons name="pizza" size={20} color={colors.carbs} />
+                  <Text style={[styles.goalLabelText, { color: colors.text }]}>Carbs</Text>
+                </View>
+                <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
+                  {dailyGoals.carbs}g
+                </Text>
+              </View>
+              {selectedMacros.includes('fat') && (
+                <View style={[styles.divider, { backgroundColor: colors.divider }]} />
+              )}
+            </>
+          )}
+
+          {selectedMacros.includes('fat') && (
+            <View style={styles.goalRow}>
+              <View style={styles.goalLabel}>
+                <Ionicons name="water" size={20} color={colors.fat} />
+                <Text style={[styles.goalLabelText, { color: colors.text }]}>Fat</Text>
+              </View>
+              <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
+                {dailyGoals.fat}g
+              </Text>
             </View>
-            <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
-              {dailyGoals.calories} kcal
-            </Text>
-          </View>
-
-          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
-
-          <View style={styles.goalRow}>
-            <View style={styles.goalLabel}>
-              <Ionicons name="nutrition" size={20} color={colors.protein} />
-              <Text style={[styles.goalLabelText, { color: colors.text }]}>Protein</Text>
-            </View>
-            <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
-              {dailyGoals.protein}g
-            </Text>
-          </View>
-
-          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
-
-          <View style={styles.goalRow}>
-            <View style={styles.goalLabel}>
-              <Ionicons name="pizza" size={20} color={colors.carbs} />
-              <Text style={[styles.goalLabelText, { color: colors.text }]}>Carbs</Text>
-            </View>
-            <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
-              {dailyGoals.carbs}g
-            </Text>
-          </View>
-
-          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
-
-          <View style={styles.goalRow}>
-            <View style={styles.goalLabel}>
-              <Ionicons name="water" size={20} color={colors.fat} />
-              <Text style={[styles.goalLabelText, { color: colors.text }]}>Fat</Text>
-            </View>
-            <Text style={[styles.goalValue, { color: colors.textSecondary }]}>
-              {dailyGoals.fat}g
-            </Text>
-          </View>
+          )}
         </View>
       </View>
 

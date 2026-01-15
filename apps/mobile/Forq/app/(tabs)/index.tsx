@@ -205,6 +205,7 @@ export default function HomeScreen() {
               key={log.log.id}
               log={log}
               onDelete={handleDeleteLog}
+              selectedMacros={selectedMacros}
             />
           ))
         )}

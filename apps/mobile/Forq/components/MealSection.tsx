@@ -14,6 +14,7 @@ interface MealSectionProps {
   onAddFood: () => void;
   onDeleteLog?: (logId: number) => void;
   onEditLog?: (log: FoodLogWithFood) => void;
+  selectedMacros?: ('protein' | 'carbs' | 'fat' | 'calories')[];
 }
 
 export const MealSection: React.FC<MealSectionProps> = ({
@@ -23,6 +24,7 @@ export const MealSection: React.FC<MealSectionProps> = ({
   onAddFood,
   onDeleteLog,
   onEditLog,
+  selectedMacros = ['calories', 'protein', 'carbs', 'fat'],
 }) => {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
@@ -60,6 +62,7 @@ export const MealSection: React.FC<MealSectionProps> = ({
               log={log}
               onDelete={onDeleteLog}
               onEdit={onEditLog}
+              selectedMacros={selectedMacros}
             />
           ))}
         </View>

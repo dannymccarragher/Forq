@@ -10,9 +10,10 @@ interface FoodLogCardProps {
   log: FoodLogWithFood;
   onDelete?: (logId: number) => void;
   onEdit?: (log: FoodLogWithFood) => void;
+  selectedMacros?: ('protein' | 'carbs' | 'fat' | 'calories')[];
 }
 
-export const FoodLogCard: React.FC<FoodLogCardProps> = ({ log, onDelete, onEdit }) => {
+export const FoodLogCard: React.FC<FoodLogCardProps> = ({ log, onDelete, onEdit, selectedMacros = ['calories', 'protein', 'carbs', 'fat'] }) => {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
 
@@ -82,33 +83,41 @@ export const FoodLogCard: React.FC<FoodLogCardProps> = ({ log, onDelete, onEdit 
 
       {/* Macros */}
       <View style={styles.macros}>
-        <View style={styles.macro}>
-          <Text style={[styles.macroValue, { color: colors.calories }]}>
-            {formatCalories(log.log.totalCalories)}
-          </Text>
-          <Text style={[styles.macroLabel, { color: colors.textTertiary }]}>cal</Text>
-        </View>
+        {selectedMacros.includes('calories') && (
+          <View style={styles.macro}>
+            <Text style={[styles.macroValue, { color: colors.calories }]}>
+              {formatCalories(log.log.totalCalories)}
+            </Text>
+            <Text style={[styles.macroLabel, { color: colors.textTertiary }]}>cal</Text>
+          </View>
+        )}
 
-        <View style={styles.macro}>
-          <Text style={[styles.macroValue, { color: colors.protein }]}>
-            {formatMacro(log.log.totalProtein)}g
-          </Text>
-          <Text style={[styles.macroLabel, { color: colors.textTertiary }]}>protein</Text>
-        </View>
+        {selectedMacros.includes('protein') && (
+          <View style={styles.macro}>
+            <Text style={[styles.macroValue, { color: colors.protein }]}>
+              {formatMacro(log.log.totalProtein)}g
+            </Text>
+            <Text style={[styles.macroLabel, { color: colors.textTertiary }]}>protein</Text>
+          </View>
+        )}
 
-        <View style={styles.macro}>
-          <Text style={[styles.macroValue, { color: colors.carbs }]}>
-            {formatMacro(log.log.totalCarbs)}g
-          </Text>
-          <Text style={[styles.macroLabel, { color: colors.textTertiary }]}>carbs</Text>
-        </View>
+        {selectedMacros.includes('carbs') && (
+          <View style={styles.macro}>
+            <Text style={[styles.macroValue, { color: colors.carbs }]}>
+              {formatMacro(log.log.totalCarbs)}g
+            </Text>
+            <Text style={[styles.macroLabel, { color: colors.textTertiary }]}>carbs</Text>
+          </View>
+        )}
 
-        <View style={styles.macro}>
-          <Text style={[styles.macroValue, { color: colors.fat }]}>
-            {formatMacro(log.log.totalFat)}g
-          </Text>
-          <Text style={[styles.macroLabel, { color: colors.textTertiary }]}>fat</Text>
-        </View>
+        {selectedMacros.includes('fat') && (
+          <View style={styles.macro}>
+            <Text style={[styles.macroValue, { color: colors.fat }]}>
+              {formatMacro(log.log.totalFat)}g
+            </Text>
+            <Text style={[styles.macroLabel, { color: colors.textTertiary }]}>fat</Text>
+          </View>
+        )}
       </View>
 
       {/* Notes */}
