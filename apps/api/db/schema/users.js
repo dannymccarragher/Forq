@@ -15,6 +15,8 @@ export const users = mysqlTable("users", {
     goalProtein: decimal("goal_protein", { precision: 10, scale: 2 }).default("150"),
     goalCarbs: decimal("goal_carbs", { precision: 10, scale: 2 }).default("250"),
     goalFat: decimal("goal_fat", { precision: 10, scale: 2 }).default("65"),
+    goalFiber: decimal("goal_fiber", { precision: 10, scale: 2 }).default("30"),
+    goalWater: decimal("goal_water", { precision: 10, scale: 2 }).default("2000"),
 
     createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
     updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`).notNull(),

@@ -25,6 +25,8 @@ router.get("/users/:id", async (req, res) => {
                 goalProtein: users.goalProtein,
                 goalCarbs: users.goalCarbs,
                 goalFat: users.goalFat,
+                goalFiber: users.goalFiber,
+                goalWater: users.goalWater,
                 createdAt: users.createdAt,
                 updatedAt: users.updatedAt,
             })
@@ -98,6 +100,8 @@ router.put("/users/:id", async (req, res) => {
                 goalProtein: users.goalProtein,
                 goalCarbs: users.goalCarbs,
                 goalFat: users.goalFat,
+                goalFiber: users.goalFiber,
+                goalWater: users.goalWater,
                 createdAt: users.createdAt,
                 updatedAt: users.updatedAt,
             })
@@ -134,6 +138,8 @@ router.get("/users/:id/goals", async (req, res) => {
                 goalProtein: users.goalProtein,
                 goalCarbs: users.goalCarbs,
                 goalFat: users.goalFat,
+                goalFiber: users.goalFiber,
+                goalWater: users.goalWater,
             })
             .from(users)
             .where(eq(users.id, parseInt(id)))
@@ -152,6 +158,8 @@ router.get("/users/:id/goals", async (req, res) => {
                 protein: parseFloat(user.goalProtein) || 150,
                 carbs: parseFloat(user.goalCarbs) || 250,
                 fat: parseFloat(user.goalFat) || 65,
+                fiber: parseFloat(user.goalFiber) || 30,
+                water: parseFloat(user.goalWater) || 2000,
             },
         });
     } catch (error) {
@@ -170,7 +178,7 @@ router.get("/users/:id/goals", async (req, res) => {
 router.put("/users/:id/goals", async (req, res) => {
     try {
         const { id } = req.params;
-        const { calories, protein, carbs, fat } = req.body;
+        const { calories, protein, carbs, fat, fiber, water } = req.body;
 
         // Verify user exists
         const [existingUser] = await db
@@ -191,6 +199,8 @@ router.put("/users/:id/goals", async (req, res) => {
         if (protein !== undefined) updates.goalProtein = parseFloat(protein);
         if (carbs !== undefined) updates.goalCarbs = parseFloat(carbs);
         if (fat !== undefined) updates.goalFat = parseFloat(fat);
+        if (fiber !== undefined) updates.goalFiber = parseFloat(fiber);
+        if (water !== undefined) updates.goalWater = parseFloat(water);
 
         // Perform update
         await db
@@ -205,6 +215,8 @@ router.put("/users/:id/goals", async (req, res) => {
                 goalProtein: users.goalProtein,
                 goalCarbs: users.goalCarbs,
                 goalFat: users.goalFat,
+                goalFiber: users.goalFiber,
+                goalWater: users.goalWater,
             })
             .from(users)
             .where(eq(users.id, parseInt(id)))
@@ -218,6 +230,8 @@ router.put("/users/:id/goals", async (req, res) => {
                 protein: parseFloat(updatedUser.goalProtein) || 150,
                 carbs: parseFloat(updatedUser.goalCarbs) || 250,
                 fat: parseFloat(updatedUser.goalFat) || 65,
+                fiber: parseFloat(updatedUser.goalFiber) || 30,
+                water: parseFloat(updatedUser.goalWater) || 2000,
             },
         });
     } catch (error) {
