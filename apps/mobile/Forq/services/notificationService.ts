@@ -93,22 +93,6 @@ export async function getScheduledNotifications(): Promise<Notifications.Notific
   return await Notifications.getAllScheduledNotificationsAsync();
 }
 
-/**
- * Send an immediate notification (for testing)
- */
-export async function sendTestNotification(): Promise<void> {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Test Notification 🔔",
-      body: "Notifications are working!",
-      data: { notificationId: 'test' },
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-      seconds: 2,
-    },
-  });
-}
 
 /**
  * Check if notifications are enabled
