@@ -30,6 +30,7 @@ interface AppContextType {
     password: string;
     firstName?: string;
     lastName?: string;
+    privacyPolicyAccepted: boolean;
   }) => Promise<void>;
   logoutUser: () => Promise<void>;
 
@@ -196,6 +197,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     password: string;
     firstName?: string;
     lastName?: string;
+    privacyPolicyAccepted: boolean;
   }) => {
     try {
       const response = await api.register(userData);

@@ -13,9 +13,11 @@ import {
   Image,
   TouchableWithoutFeedback,
   Keyboard,
+  Linking,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '@/context/AppContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/colors';
@@ -33,6 +35,7 @@ export default function SignupScreen() {
     firstName: '',
     lastName: '',
   });
+  const [privacyPolicyAccepted, setPrivacyPolicyAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const updateField = (field: string, value: string) => {
@@ -61,6 +64,11 @@ export default function SignupScreen() {
       return false;
     }
 
+    if (!privacyPolicyAccepted) {
+      Alert.alert('Error', 'You must accept the Privacy Policy to create an account');
+      return false;
+    }
+
     return true;
   };
 
@@ -77,6 +85,7 @@ export default function SignupScreen() {
         password: formData.password,
         firstName: formData.firstName.trim() || undefined,
         lastName: formData.lastName.trim() || undefined,
+        privacyPolicyAccepted,
       });
 
       // Navigate to main app (user is now logged in)
@@ -111,8 +120,8 @@ export default function SignupScreen() {
                 style={styles.logo}
                 resizeMode="contain"
               />
-            <Text style={[styles.title, { color: colors.text }]}>Create Account</Text>
-            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Start your nutrition journey today</Text>
+              <Text style={[styles.title, { color: colors.text }]}>Create Account</Text>
+              <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Start your nutrition journey today</Text>
             </View>
 
             {/* Signup Form */}
@@ -209,6 +218,39 @@ export default function SignupScreen() {
                   editable={!loading}
                 />
               </View>
+
+              {/* Privacy Policy Acceptance */}
+              <TouchableOpacity
+                style={styles.privacyContainer}
+                onPress={() => setPrivacyPolicyAccepted(!privacyPolicyAccepted)}
+                disabled={loading}
+                activeOpacity={0.7}
+              >
+                <View
+                  style={[
+                    styles.checkbox,
+                    { borderColor: colors.border },
+                    privacyPolicyAccepted && { backgroundColor: colors.primary, borderColor: colors.primary },
+                  ]}
+                >
+                  {privacyPolicyAccepted && (
+                    <Ionicons name="checkmark" size={16} color="#fff" />
+                  )}
+                </View>
+                <Text style={[styles.privacyText, { color: colors.text }]}>
+                  I accept the{' '}
+                  <Text
+                    style={[styles.privacyLink, { color: colors.primary }]}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      Linking.openURL('https://dannymccarragher.github.io/');
+                    }}
+                  >
+                    Privacy Policy
+                  </Text>
+                  <Text style={styles.required}> *</Text>
+                </Text>
+              </TouchableOpacity>
 
               <TouchableOpacity
                 style={[styles.signupButton, { backgroundColor: colors.primary }, loading && styles.buttonDisabled]}
@@ -320,5 +362,30 @@ const styles = StyleSheet.create({
   loginLink: {
     fontSize: 14,
     fontWeight: '600',
+  },
+  privacyContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+    marginTop: 8,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    marginRight: 12,
+    marginTop: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  privacyText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  privacyLink: {
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });

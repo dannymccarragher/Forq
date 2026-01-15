@@ -320,6 +320,7 @@ export async function register(userData: {
   password: string;
   firstName?: string;
   lastName?: string;
+  privacyPolicyAccepted: boolean;
 }): Promise<{ success: boolean; message: string; user: any }> {
   return request('/api/auth/register', {
     method: 'POST',
