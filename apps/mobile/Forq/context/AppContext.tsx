@@ -77,6 +77,10 @@ interface AppContextType {
   selectedMacros: ('protein' | 'carbs' | 'fat' | 'calories' | 'fiber' | 'water')[];
   setSelectedMacros: (macros: ('protein' | 'carbs' | 'fat' | 'calories' | 'fiber' | 'water')[]) => void;
   hasSelectedMacros: boolean;
+
+  // Unit system preference
+  unitSystem: 'metric' | 'imperial';
+  setUnitSystem: (system: 'metric' | 'imperial') => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -96,6 +100,7 @@ interface AppProviderProps {
 const SECURE_STORE_KEY = 'forq_user_id';
 const MACRO_PREFERENCES_KEY = 'forq_macro_preferences';
 const ONBOARDING_COMPLETE_KEY = 'forq_onboarding_complete';
+const UNIT_SYSTEM_KEY = 'forq_unit_system';
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // Auth state
@@ -134,6 +139,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [selectedMacros, setSelectedMacrosState] = useState<('protein' | 'carbs' | 'fat' | 'calories' | 'fiber' | 'water')[]>([]);
   const [hasSelectedMacros, setHasSelectedMacros] = useState(false);
 
+  // Unit system preference state
+  const [unitSystem, setUnitSystemState] = useState<'metric' | 'imperial'>('metric');
+
   // Check for existing session on mount
   useEffect(() => {
     checkAuthStatus();
@@ -153,8 +161,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
           setUser(response.user);
           setIsAuthenticated(true);
 
-          // Load macro preferences before finishing loading
+          // Load macro preferences and unit system before finishing loading
           await loadMacroPreferencesForUser(response.user.id);
+          await loadUnitSystemForUser(response.user.id);
         } else {
           // Invalid session, clear storage
           await SecureStore.deleteItemAsync(SECURE_STORE_KEY);
@@ -181,8 +190,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setUser(response.user);
         setIsAuthenticated(true);
 
-        // Load macro preferences for this user
+        // Load macro preferences and unit system for this user
         await loadMacroPreferencesForUser(response.user.id);
+        await loadUnitSystemForUser(response.user.id);
       }
     } catch (error) {
       console.error('Login failed:', error);
@@ -222,7 +232,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // Logout user
   const logoutUser = async () => {
     try {
-      // Clear secure storage (but keep user-specific preferences like macros for when they log back in)
+      // Clear secure storage (but keep user-specific preferences like macros and unit system for when they log back in)
       await SecureStore.deleteItemAsync(SECURE_STORE_KEY);
 
       // Clear state
@@ -233,6 +243,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       setFavorites([]);
       setSelectedMacrosState([]);
       setHasSelectedMacros(false);
+      setUnitSystemState('metric'); // Reset to default
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -280,6 +291,37 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       setHasSelectedMacros(true);
     } catch (error) {
       console.error('Failed to save macro preferences:', error);
+    }
+  };
+
+  // Load unit system for a specific user
+  const loadUnitSystemForUser = async (userIdToLoad: number) => {
+    try {
+      const stored = await SecureStore.getItemAsync(`${UNIT_SYSTEM_KEY}_${userIdToLoad}`);
+      if (stored) {
+        setUnitSystemState(stored as 'metric' | 'imperial');
+      } else {
+        // Default to metric
+        setUnitSystemState('metric');
+      }
+    } catch (error) {
+      console.error('Failed to load unit system:', error);
+      setUnitSystemState('metric');
+    }
+  };
+
+  // Set unit system preference
+  const setUnitSystem = async (system: 'metric' | 'imperial') => {
+    // Update state immediately for responsive UI
+    setUnitSystemState(system);
+
+    // Save to storage in the background
+    try {
+      if (userId > 0) {
+        await SecureStore.setItemAsync(`${UNIT_SYSTEM_KEY}_${userId}`, system);
+      }
+    } catch (error) {
+      console.error('Failed to save unit system:', error);
     }
   };
 
@@ -497,6 +539,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     selectedMacros,
     setSelectedMacros,
     hasSelectedMacros,
+    unitSystem,
+    setUnitSystem,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

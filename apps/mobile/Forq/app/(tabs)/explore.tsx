@@ -12,8 +12,9 @@ export default function ProfileScreen() {
   const colors = Colors[colorScheme];
   const router = useRouter();
 
-  const { dailyGoals, user, logoutUser, selectedMacros } = useApp();
+  const { dailyGoals, user, logoutUser, selectedMacros, unitSystem, setUnitSystem } = useApp();
   const [showThemeModal, setShowThemeModal] = useState(false);
+  const [showUnitSystemModal, setShowUnitSystemModal] = useState(false);
 
   const handleLogout = () => {
     Alert.alert(
@@ -230,13 +231,18 @@ export default function ProfileScreen() {
 
           <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
-          {/* <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => setShowUnitSystemModal(true)}>
             <View style={styles.settingLabel}>
-              <Ionicons name="language-outline" size={24} color={colors.text} />
-              <Text style={[styles.settingText, { color: colors.text }]}>Language</Text>
+              <Ionicons name="speedometer-outline" size={24} color={colors.text} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Unit System</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
-          </TouchableOpacity> */}
+            <View style={styles.settingRight}>
+              <Text style={[styles.settingValue, { color: colors.textSecondary }]}>
+                {unitSystem === 'metric' ? 'Metric' : 'Imperial'}
+              </Text>
+              <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
+            </View>
+          </TouchableOpacity>
 
           <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
@@ -348,6 +354,75 @@ export default function ProfileScreen() {
             >
               <Ionicons name="phone-portrait" size={24} color={colors.text} />
               <Text style={[styles.themeOptionText, { color: colors.text }]}>System Default</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Unit System Modal */}
+      <Modal
+        visible={showUnitSystemModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowUnitSystemModal(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowUnitSystemModal(false)}
+        >
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Choose Unit System</Text>
+              <TouchableOpacity onPress={() => setShowUnitSystemModal(false)}>
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={[
+                styles.themeOption,
+                { borderColor: colors.border },
+                unitSystem === 'metric' && { backgroundColor: colors.primaryLight || colors.primary + '20' }
+              ]}
+              onPress={async () => {
+                await setUnitSystem('metric');
+                setShowUnitSystemModal(false);
+              }}
+            >
+              <Ionicons name="speedometer" size={24} color={colors.text} />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.themeOptionText, { color: colors.text }]}>Metric</Text>
+                <Text style={[styles.unitSystemDescription, { color: colors.textSecondary }]}>
+                  kg, cm, ml
+                </Text>
+              </View>
+              {unitSystem === 'metric' && (
+                <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.themeOption,
+                { borderColor: colors.border },
+                unitSystem === 'imperial' && { backgroundColor: colors.primaryLight || colors.primary + '20' }
+              ]}
+              onPress={async () => {
+                await setUnitSystem('imperial');
+                setShowUnitSystemModal(false);
+              }}
+            >
+              <Ionicons name="speedometer" size={24} color={colors.text} />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.themeOptionText, { color: colors.text }]}>Imperial</Text>
+                <Text style={[styles.unitSystemDescription, { color: colors.textSecondary }]}>
+                  lbs, ft/in, fl oz
+                </Text>
+              </View>
+              {unitSystem === 'imperial' && (
+                <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
+              )}
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -484,9 +559,12 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   themeOptionText: {
-    flex: 1,
     fontSize: 16,
     fontWeight: '600',
+  },
+  unitSystemDescription: {
+    fontSize: 13,
+    marginTop: 2,
   },
   notificationsModal: {
     flex: 1,

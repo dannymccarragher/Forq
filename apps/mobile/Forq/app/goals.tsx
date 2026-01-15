@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -25,6 +25,11 @@ export default function GoalsScreen() {
   const [editing, setEditing] = useState(false);
   const [tempGoals, setTempGoals] = useState(dailyGoals);
   const [saving, setSaving] = useState(false);
+
+  // Sync tempGoals with dailyGoals when dailyGoals changes
+  useEffect(() => {
+    setTempGoals(dailyGoals);
+  }, [dailyGoals]);
 
   const handleSave = async () => {
     setSaving(true);
