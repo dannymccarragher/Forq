@@ -10,10 +10,10 @@ interface FoodLogCardProps {
   log: FoodLogWithFood;
   onDelete?: (logId: number) => void;
   onEdit?: (log: FoodLogWithFood) => void;
-  selectedMacros?: ('protein' | 'carbs' | 'fat' | 'calories')[];
+  selectedMacros?: ('protein' | 'carbs' | 'fat' | 'calories' | 'fiber' | 'water')[];
 }
 
-export const FoodLogCard: React.FC<FoodLogCardProps> = ({ log, onDelete, onEdit, selectedMacros = ['calories', 'protein', 'carbs', 'fat'] }) => {
+export const FoodLogCard: React.FC<FoodLogCardProps> = ({ log, onDelete, onEdit, selectedMacros = ['calories', 'protein', 'carbs', 'fat', 'fiber', 'water'] }) => {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
 

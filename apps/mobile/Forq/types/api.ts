@@ -33,6 +33,7 @@ export interface Food {
   fiber?: number;
   sugar?: number;
   sodium?: number;
+  water?: number;
   description?: string;
   category?: string;
   isCustom: boolean;
@@ -52,6 +53,8 @@ export interface FoodLog {
   totalProtein?: number;
   totalCarbs?: number;
   totalFat?: number;
+  totalFiber?: number;
+  totalWater?: number;
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -82,6 +85,8 @@ export interface NutritionalSummary {
     protein: number;
     carbs: number;
     fat: number;
+    fiber: number;
+    water: number;
     entries: number;
   };
   byMealType: {
@@ -90,6 +95,8 @@ export interface NutritionalSummary {
     protein: number;
     carbs: number;
     fat: number;
+    fiber: number;
+    water: number;
     entries: number;
   }[];
 }

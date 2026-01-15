@@ -27,6 +27,7 @@ export const foods = mysqlTable("foods", {
     fiber: decimal("fiber", { precision: 10, scale: 2 }), // grams
     sugar: decimal("sugar", { precision: 10, scale: 2 }), // grams
     sodium: decimal("sodium", { precision: 10, scale: 2 }), // mg
+    water: decimal("water", { precision: 10, scale: 2 }), // ml
 
     // Additional metadata
     description: text("description"),
@@ -61,6 +62,8 @@ export const foodLogs = mysqlTable("food_logs", {
     totalProtein: decimal("total_protein", { precision: 10, scale: 2 }),
     totalCarbs: decimal("total_carbs", { precision: 10, scale: 2 }),
     totalFat: decimal("total_fat", { precision: 10, scale: 2 }),
+    totalFiber: decimal("total_fiber", { precision: 10, scale: 2 }),
+    totalWater: decimal("total_water", { precision: 10, scale: 2 }),
 
     // Optional notes
     notes: text("notes"),

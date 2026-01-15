@@ -65,32 +65,6 @@ export default function DiaryScreen() {
     return <LoadingSpinner message="Loading your food diary..." />;
   }
 
-  // Group food logs by meal type
-  const mealTypes: Array<'breakfast' | 'lunch' | 'dinner' | 'snack'> = ['breakfast', 'lunch', 'dinner', 'snack'];
-  const groupedLogs = mealTypes.reduce((acc, mealType) => {
-    acc[mealType] = foodLogs.filter(log => log.log.mealType === mealType);
-    return acc;
-  }, {} as Record<string, typeof foodLogs>);
-
-  const getMealIcon = (mealType: string) => {
-    switch (mealType) {
-      case 'breakfast':
-        return 'sunny';
-      case 'lunch':
-        return 'restaurant';
-      case 'dinner':
-        return 'moon';
-      case 'snack':
-        return 'cafe';
-      default:
-        return 'nutrition';
-    }
-  };
-
-  const getMealLabel = (mealType: string) => {
-    return mealType.charAt(0).toUpperCase() + mealType.slice(1);
-  };
-
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -141,9 +115,9 @@ export default function DiaryScreen() {
         </View>
       </View>
 
-      {/* Meals by Type */}
-      {foodLogs.length === 0 ? (
-        <View style={styles.section}>
+      {/* All Food Entries */}
+      <View style={styles.section}>
+        {foodLogs.length === 0 ? (
           <View style={[styles.emptyState, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Ionicons name="restaurant-outline" size={48} color={colors.textTertiary} />
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
@@ -160,37 +134,27 @@ export default function DiaryScreen() {
               <Text style={styles.addButtonText}>Add Food</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      ) : (
-        mealTypes.map((mealType) => {
-          const logs = groupedLogs[mealType];
-          if (logs.length === 0) return null;
-
-          return (
-            <View key={mealType} style={styles.section}>
-              <View style={styles.mealHeader}>
-                <View style={styles.mealTitleRow}>
-                  <Ionicons name={getMealIcon(mealType)} size={24} color={colors.text} />
-                  <Text style={[styles.mealTitle, { color: colors.text }]}>
-                    {getMealLabel(mealType)}
-                  </Text>
-                </View>
-                <Text style={[styles.mealCount, { color: colors.textSecondary }]}>
-                  {logs.length} {logs.length === 1 ? 'item' : 'items'}
-                </Text>
-              </View>
-              {logs.map((log) => (
-                <FoodLogCard
-                  key={log.log.id}
-                  log={log}
-                  onDelete={handleDeleteLog}
-                  selectedMacros={selectedMacros}
-                />
-              ))}
+        ) : (
+          <>
+            <View style={styles.listHeader}>
+              <Text style={[styles.listTitle, { color: colors.text }]}>
+                All Food Entries
+              </Text>
+              <Text style={[styles.listCount, { color: colors.textSecondary }]}>
+                {foodLogs.length} {foodLogs.length === 1 ? 'item' : 'items'}
+              </Text>
             </View>
-          );
-        })
-      )}
+            {foodLogs.map((log) => (
+              <FoodLogCard
+                key={log.log.id}
+                log={log}
+                onDelete={handleDeleteLog}
+                selectedMacros={selectedMacros}
+              />
+            ))}
+          </>
+        )}
+      </View>
 
       <View style={styles.footer} />
     </ScrollView>
@@ -259,22 +223,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 20,
   },
-  mealHeader: {
+  listHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
-  mealTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  mealTitle: {
-    fontSize: 18,
+  listTitle: {
+    fontSize: 20,
     fontWeight: '700',
   },
-  mealCount: {
+  listCount: {
     fontSize: 14,
   },
   emptyState: {

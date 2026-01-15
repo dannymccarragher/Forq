@@ -64,6 +64,8 @@ export default function HomeScreen() {
   const currentProtein = dailySummary?.totals.protein || 0;
   const currentCarbs = dailySummary?.totals.carbs || 0;
   const currentFat = dailySummary?.totals.fat || 0;
+  const currentFiber = dailySummary?.totals.fiber || 0;
+  const currentWater = dailySummary?.totals.water || 0;
 
   return (
     <ScrollView
@@ -151,6 +153,24 @@ export default function HomeScreen() {
                 goal={dailyGoals.fat}
                 unit="g"
                 color={colors.fat}
+              />
+            )}
+            {selectedMacros.includes('fiber') && (
+              <MacroProgressBar
+                label="Fiber"
+                current={currentFiber}
+                goal={dailyGoals.fiber}
+                unit="g"
+                color={colors.fiber}
+              />
+            )}
+            {selectedMacros.includes('water') && (
+              <MacroProgressBar
+                label="Water"
+                current={currentWater}
+                goal={dailyGoals.water}
+                unit="ml"
+                color={colors.water}
               />
             )}
           </View>

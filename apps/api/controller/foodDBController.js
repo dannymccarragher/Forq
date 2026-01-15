@@ -403,6 +403,8 @@ router.get("/food-logs/summary", async (req, res) => {
                 totalProtein: sql`SUM(${foodLogs.totalProtein})`,
                 totalCarbs: sql`SUM(${foodLogs.totalCarbs})`,
                 totalFat: sql`SUM(${foodLogs.totalFat})`,
+                totalFiber: sql`SUM(${foodLogs.totalFiber})`,
+                totalWater: sql`SUM(${foodLogs.totalWater})`,
                 entryCount: sql`COUNT(*)`
             })
             .from(foodLogs)
@@ -416,6 +418,8 @@ router.get("/food-logs/summary", async (req, res) => {
                 protein: sql`SUM(${foodLogs.totalProtein})`,
                 carbs: sql`SUM(${foodLogs.totalCarbs})`,
                 fat: sql`SUM(${foodLogs.totalFat})`,
+                fiber: sql`SUM(${foodLogs.totalFiber})`,
+                water: sql`SUM(${foodLogs.totalWater})`,
                 count: sql`COUNT(*)`
             })
             .from(foodLogs)
@@ -430,6 +434,8 @@ router.get("/food-logs/summary", async (req, res) => {
                     protein: parseFloat(totals.totalProtein) || 0,
                     carbs: parseFloat(totals.totalCarbs) || 0,
                     fat: parseFloat(totals.totalFat) || 0,
+                    fiber: parseFloat(totals.totalFiber) || 0,
+                    water: parseFloat(totals.totalWater) || 0,
                     entries: parseInt(totals.entryCount) || 0
                 },
                 byMealType: mealBreakdown.map(meal => ({
@@ -438,6 +444,8 @@ router.get("/food-logs/summary", async (req, res) => {
                     protein: parseFloat(meal.protein) || 0,
                     carbs: parseFloat(meal.carbs) || 0,
                     fat: parseFloat(meal.fat) || 0,
+                    fiber: parseFloat(meal.fiber) || 0,
+                    water: parseFloat(meal.water) || 0,
                     entries: parseInt(meal.count) || 0
                 }))
             }
@@ -492,6 +500,8 @@ router.post("/food-logs", async (req, res) => {
             totalProtein: food.protein ? parseFloat(food.protein) * servingMultiplier : null,
             totalCarbs: food.carbohydrates ? parseFloat(food.carbohydrates) * servingMultiplier : null,
             totalFat: food.fat ? parseFloat(food.fat) * servingMultiplier : null,
+            totalFiber: food.fiber ? parseFloat(food.fiber) * servingMultiplier : null,
+            totalWater: food.water ? parseFloat(food.water) * servingMultiplier : null,
             notes: notes || null
         };
 
@@ -568,6 +578,8 @@ router.put("/food-logs/:id", async (req, res) => {
                 updates.totalProtein = food.protein ? parseFloat(food.protein) * servingMultiplier : null;
                 updates.totalCarbs = food.carbohydrates ? parseFloat(food.carbohydrates) * servingMultiplier : null;
                 updates.totalFat = food.fat ? parseFloat(food.fat) * servingMultiplier : null;
+                updates.totalFiber = food.fiber ? parseFloat(food.fiber) * servingMultiplier : null;
+                updates.totalWater = food.water ? parseFloat(food.water) * servingMultiplier : null;
             }
         }
 
