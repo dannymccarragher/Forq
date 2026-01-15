@@ -7,6 +7,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AppProvider, useApp } from '@/context/AppContext';
+import { GlpProvider } from '@/context/GlpContext';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -78,7 +79,9 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <AppProvider>
-      <RootLayoutNav />
+      <GlpProvider>
+        <RootLayoutNav />
+      </GlpProvider>
     </AppProvider>
   );
 }

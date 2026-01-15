@@ -11,7 +11,10 @@ export default {
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
     ios: {
-      supportsTablet: true
+      supportsTablet: true,
+      infoPlist: {
+        UIBackgroundModes: ["remote-notification"]
+      }
     },
     android: {
       adaptiveIcon: {
@@ -21,7 +24,12 @@ export default {
         monochromeImage: "./assets/images/android-icon-monochrome.png"
       },
       edgeToEdgeEnabled: true,
-      predictiveBackGestureEnabled: false
+      predictiveBackGestureEnabled: false,
+      permissions: [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE"
+      ]
     },
     web: {
       output: "static",
@@ -30,6 +38,16 @@ export default {
     plugins: [
       "expo-router",
       "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          icon: "./assets/images/Forq.png",
+          color: "#007AFF",
+          sounds: ["default"],
+          androidMode: "default",
+          androidCollapsedTitle: "Forq"
+        }
+      ],
       [
         "expo-splash-screen",
         {
