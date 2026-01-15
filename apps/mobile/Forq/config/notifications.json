@@ -1,0 +1,39 @@
+{
+  "dailyNotifications": [
+    {
+      "id": "morning-reminder",
+      "title": "Good Morning! 🌅",
+      "body": "Ready to log your food today?",
+      "hour": 8,
+      "minute": 0
+    },
+    {
+      "id": "midday-reminder",
+      "title": "Time to Check In 📱",
+      "body": "Don't forget to log your food",
+      "hour": 12,
+      "minute": 30
+    },
+    {
+      "id": "afternoon-reminder",
+      "title": "Food Tracking Reminder 🍽️",
+      "body": "Keep up with your nutrition goals",
+      "hour": 18,
+      "minute": 30
+    },
+    {
+      "id": "evening-reminder",
+      "title": "End of Day Check-in ✨",
+      "body": "Review your progress for today",
+      "hour": 21,
+      "minute": 0
+    }
+  ],
+  "motivationalMessages": [
+    "You're doing great! Keep tracking your nutrition 💪",
+    "Consistency is key! Log your meals today 📝",
+    "Your health journey matters. Track your progress 🌟",
+    "Small steps lead to big changes. Keep going! 🎯",
+    "You've got this! Stay on track today 🚀"
+  ]
+}

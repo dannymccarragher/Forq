@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Modal, Switch, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, Modal, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -14,16 +14,6 @@ export default function ProfileScreen() {
 
   const { dailyGoals, user, logoutUser, selectedMacros } = useApp();
   const [showThemeModal, setShowThemeModal] = useState(false);
-  const [showNotificationsModal, setShowNotificationsModal] = useState(false);
-
-  // Notification settings state
-  const [notifications, setNotifications] = useState({
-    dailyReminders: true,
-    mealReminders: true,
-    goalAchievements: true,
-    weeklyProgress: false,
-    motivational: true,
-  });
 
   const handleLogout = () => {
     Alert.alert(
@@ -191,16 +181,6 @@ export default function ProfileScreen() {
 
           <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
-          <TouchableOpacity style={styles.settingRow} onPress={() => setShowNotificationsModal(true)}>
-            <View style={styles.settingLabel}>
-              <Ionicons name="notifications-outline" size={24} color={colors.text} />
-              <Text style={[styles.settingText, { color: colors.text }]}>Notifications</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textTertiary} />
-          </TouchableOpacity>
-
-          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
-
           <TouchableOpacity style={styles.settingRow} onPress={() => setShowThemeModal(true)}>
             <View style={styles.settingLabel}>
               <Ionicons name="moon-outline" size={24} color={colors.text} />
@@ -336,143 +316,6 @@ export default function ProfileScreen() {
               <Text style={[styles.themeOptionText, { color: colors.text }]}>System Default</Text>
             </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      </Modal>
-
-      {/* Notifications Modal */}
-      <Modal
-        visible={showNotificationsModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowNotificationsModal(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowNotificationsModal(false)}
-        >
-          <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
-            <ScrollView
-              style={[styles.notificationsModal, { backgroundColor: colors.surface }]}
-              contentContainerStyle={styles.notificationsContent}
-            >
-              <View style={styles.modalHeader}>
-                <Text style={[styles.modalTitle, { color: colors.text }]}>Notification Settings</Text>
-                <TouchableOpacity onPress={() => setShowNotificationsModal(false)}>
-                  <Ionicons name="close" size={24} color={colors.text} />
-                </TouchableOpacity>
-              </View>
-
-              <Text style={[styles.notificationDescription, { color: colors.textSecondary }]}>
-                Manage your notification preferences
-              </Text>
-
-              {/* Daily Reminders */}
-              <View style={[styles.notificationItem, { borderColor: colors.border }]}>
-                <View style={styles.notificationInfo}>
-                  <View style={styles.notificationHeader}>
-                    <Ionicons name="calendar-outline" size={22} color={colors.primary} />
-                    <Text style={[styles.notificationTitle, { color: colors.text }]}>Daily Reminders</Text>
-                  </View>
-                  <Text style={[styles.notificationSubtext, { color: colors.textSecondary }]}>
-                    Get reminded to log your meals daily
-                  </Text>
-                </View>
-                <Switch
-                  value={notifications.dailyReminders}
-                  onValueChange={(value) => setNotifications({ ...notifications, dailyReminders: value })}
-                  trackColor={{ false: colors.border, true: colors.primaryLight || colors.primary }}
-                  thumbColor={notifications.dailyReminders ? colors.primary : colors.textTertiary}
-                />
-              </View>
-
-              {/* Meal Reminders */}
-              <View style={[styles.notificationItem, { borderColor: colors.border }]}>
-                <View style={styles.notificationInfo}>
-                  <View style={styles.notificationHeader}>
-                    <Ionicons name="restaurant-outline" size={22} color={colors.primary} />
-                    <Text style={[styles.notificationTitle, { color: colors.text }]}>Meal Reminders</Text>
-                  </View>
-                  <Text style={[styles.notificationSubtext, { color: colors.textSecondary }]}>
-                    Reminders for breakfast, lunch, and dinner
-                  </Text>
-                </View>
-                <Switch
-                  value={notifications.mealReminders}
-                  onValueChange={(value) => setNotifications({ ...notifications, mealReminders: value })}
-                  trackColor={{ false: colors.border, true: colors.primaryLight || colors.primary }}
-                  thumbColor={notifications.mealReminders ? colors.primary : colors.textTertiary}
-                />
-              </View>
-
-              {/* Goal Achievements */}
-              <View style={[styles.notificationItem, { borderColor: colors.border }]}>
-                <View style={styles.notificationInfo}>
-                  <View style={styles.notificationHeader}>
-                    <Ionicons name="trophy-outline" size={22} color={colors.primary} />
-                    <Text style={[styles.notificationTitle, { color: colors.text }]}>Goal Achievements</Text>
-                  </View>
-                  <Text style={[styles.notificationSubtext, { color: colors.textSecondary }]}>
-                    Celebrate when you hit your nutrition goals
-                  </Text>
-                </View>
-                <Switch
-                  value={notifications.goalAchievements}
-                  onValueChange={(value) => setNotifications({ ...notifications, goalAchievements: value })}
-                  trackColor={{ false: colors.border, true: colors.primaryLight || colors.primary }}
-                  thumbColor={notifications.goalAchievements ? colors.primary : colors.textTertiary}
-                />
-              </View>
-
-              {/* Weekly Progress */}
-              <View style={[styles.notificationItem, { borderColor: colors.border }]}>
-                <View style={styles.notificationInfo}>
-                  <View style={styles.notificationHeader}>
-                    <Ionicons name="stats-chart-outline" size={22} color={colors.primary} />
-                    <Text style={[styles.notificationTitle, { color: colors.text }]}>Weekly Progress</Text>
-                  </View>
-                  <Text style={[styles.notificationSubtext, { color: colors.textSecondary }]}>
-                    Get a summary of your weekly nutrition stats
-                  </Text>
-                </View>
-                <Switch
-                  value={notifications.weeklyProgress}
-                  onValueChange={(value) => setNotifications({ ...notifications, weeklyProgress: value })}
-                  trackColor={{ false: colors.border, true: colors.primaryLight || colors.primary }}
-                  thumbColor={notifications.weeklyProgress ? colors.primary : colors.textTertiary}
-                />
-              </View>
-
-              {/* Motivational Messages */}
-              <View style={[styles.notificationItem, { borderColor: colors.border }]}>
-                <View style={styles.notificationInfo}>
-                  <View style={styles.notificationHeader}>
-                    <Ionicons name="sparkles-outline" size={22} color={colors.primary} />
-                    <Text style={[styles.notificationTitle, { color: colors.text }]}>Motivational Messages</Text>
-                  </View>
-                  <Text style={[styles.notificationSubtext, { color: colors.textSecondary }]}>
-                    Receive motivational tips and encouragement
-                  </Text>
-                </View>
-                <Switch
-                  value={notifications.motivational}
-                  onValueChange={(value) => setNotifications({ ...notifications, motivational: value })}
-                  trackColor={{ false: colors.border, true: colors.primaryLight || colors.primary }}
-                  thumbColor={notifications.motivational ? colors.primary : colors.textTertiary}
-                />
-              </View>
-
-              <TouchableOpacity
-                style={[styles.saveButton, { backgroundColor: colors.primary }]}
-                onPress={() => {
-                  Alert.alert('Success', 'Notification preferences saved!');
-                  setShowNotificationsModal(false);
-                }}
-              >
-                <Text style={styles.saveButtonText}>Save Preferences</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
     </ScrollView>
@@ -612,9 +455,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   notificationsModal: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '90%',
+    flex: 1,
   },
   notificationsContent: {
     padding: 20,

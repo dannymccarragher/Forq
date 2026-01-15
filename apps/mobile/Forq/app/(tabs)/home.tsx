@@ -119,7 +119,7 @@ export default function HomeScreen() {
           <View style={styles.progressBarsContainer}>
             {selectedMacros.includes('calories') && (
               <MacroProgressBar
-                label="Energy"
+                label="Calories"
                 current={currentCalories}
                 goal={dailyGoals.calories}
                 unit="kcal"

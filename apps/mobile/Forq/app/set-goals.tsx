@@ -9,12 +9,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
+import { requestNotificationPermissions, scheduleDailyNotifications } from '@/services/notificationService';
 
 type MacroType = 'protein' | 'carbs' | 'fat' | 'calories';
 
@@ -32,7 +34,7 @@ export default function SetGoalsScreen() {
   const colors = Colors[colorScheme];
   const router = useRouter();
   const { selectedMacros, dailyGoals, setDailyGoals } = useApp();
-  
+
   const [loading, setLoading] = useState(false);
   const [goals, setGoals] = useState({
     calories: dailyGoals.calories.toString(),
@@ -77,9 +79,29 @@ export default function SetGoalsScreen() {
   ];
 
   // Filter to only show selected macros
-  const visibleGoals = macroGoalInputs.filter((macro) => 
+  const visibleGoals = macroGoalInputs.filter((macro) =>
     selectedMacros.includes(macro.id)
   );
+
+  const setupNotifications = async () => {
+    try {
+      const granted = await requestNotificationPermissions();
+
+      if (granted) {
+        // Schedule all daily notifications
+        await scheduleDailyNotifications();
+        console.log('Notifications scheduled successfully');
+      } else {
+        Alert.alert(
+          'Notifications Disabled',
+          'You can enable notifications later in your device settings to receive meal reminders and progress updates.',
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (error) {
+      console.error('Error setting up notifications:', error);
+    }
+  };
 
   const handleSave = async () => {
     setLoading(true);
@@ -92,6 +114,10 @@ export default function SetGoalsScreen() {
       };
 
       await setDailyGoals(goalsToSave);
+
+      // Request notification permissions and schedule notifications
+      await setupNotifications();
+
       router.replace('/(tabs)');
     } catch (error) {
       console.error('Failed to save goals:', error);
